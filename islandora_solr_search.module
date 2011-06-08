@@ -105,7 +105,7 @@ function islandora_solr_search_block_view($block_name = '') {
       // Otherwise, simply load the form.
       } 
       elseif ( !empty( $solr_blocks[$block_name]['form'] )) {
-        $block['content'] = drupal_get_form($solr_blocks[$name]['form']);
+        $block['content'] = drupal_get_form($solr_blocks[$block_name]['form']);
       }
     }
   return $block;
@@ -210,6 +210,7 @@ function islandora_solr_search_islandora_solr_query_blocks() {
 function islandora_solr_simple_search_form() {
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
   $resultsClass = new IslandoraSolrResults();
+  //dsm($resultsClass->build_simple_solr_form());
   return $resultsClass->build_simple_solr_form();
 }
 
@@ -240,6 +241,7 @@ function islandora_solr_search_block_form() {
 
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
   $resultsClass = new IslandoraSolrResults();
+  //dsm($resultsClass->build_solr_search_form(NULL, NULL, $queryClass->solrQuery));
   return $resultsClass->build_solr_search_form(NULL, NULL, $queryClass->solrQuery);
 }
 
@@ -249,7 +251,9 @@ function theme_islandora_solr_search_block_form($form) {
 
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
   $resultsClass = new IslandoraSolrResults();
+  
   $form = $form['form']; // in D7 the form array is nested in another array.
+  //dsm($form);
   return $resultsClass->theme_solr_search_form($form);
 }
 
@@ -404,6 +408,6 @@ function islandora_solr_search_init() {
   // I still had to modify the constant in the .install file to a string,
   // because this function isn't loaded on install. I'm going to have to
   // rethink this stuff.
-  define('Apache_Solr_Service', 'Apache_Solr_Service'); 
+  // define('Apache_Solr_Service', 'Apache_Solr_Service'); 
 
 }

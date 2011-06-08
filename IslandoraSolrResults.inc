@@ -366,7 +366,7 @@ class IslandoraSolrResults {
     $terms = trim(variable_get('islandora_solr_searchterms', 'dc.title ~ Title,dc.subject ~ Subject'));
     $termsArray = preg_split('/[\n]/', $terms);
     foreach ($termsArray as $term) {
-      $vals = split('~', $term);
+      $vals = explode('~', $term); // split() is depricated in php 5.3
       if (!$vals[1]) {
         $vals[1] = $vals[0];
       }
@@ -476,7 +476,7 @@ class IslandoraSolrResults {
       }
     }
     $output .= drupal_render($form['submit']);
-    $output .= drupal_render($form);
+    $output .= drupal_render_children($form); // D7 renders all the other form elements with drupal_render_children instead of drupal_render. The latter would cause an infinite loop.
     return $output;
   }
 
