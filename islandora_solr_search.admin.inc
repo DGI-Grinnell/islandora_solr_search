@@ -1,16 +1,22 @@
-<?php
+<?php // $Id$
+
+/**
+ * @file
+ * islandora_solrsearch.admin.inc includes all admin functions for form generation, validation,
+ * submitting, etc..
+ */
 
 /**
  * Function to return admin setting form
  * @return array 
  */
-function islandora_solr_admin_settings(&$form_state) {
+function islandora_solr_admin_settings($form, &$form_state) {
 
   //checks for existence of PHP Solr client.
   module_load_include('php', 'islandora_solr_search', 'SolrPhpClient/Apache/Solr/Service');
   if (!class_exists(Apache_Solr_Service)) {
-    drupal_set_message("This module requires the " . l('Apache Solr php client', 'http://code.google.com/p/solr-php-client') . '.
-      Please install the client directory in the root directory of this module before continuing.');
+    $message = t('This module requires the <a href="@link">Apache Solr php client</a>. Please install the client directory in the root directory of this module before continuing.', array( '@link' => 'http://code.google.com/p/solr-php-client'));
+    drupal_set_message($message);
     return;
   }
   $handlers['standard'] = 'standard';
@@ -46,8 +52,8 @@ function islandora_solr_admin_settings(&$form_state) {
     '#weight' => -1,
     '#description' => t('The url of the Solr installation.  Defaults to localhost:8080/solr.'),
     '#default_value' => $solr_url,
-    '#ahah' => array(
-      'path' => 'islandora/solr/process',
+    '#ajax' => array(
+      'callback' => 'update_solr_url_div',
       'wrapper' => 'solr-url',
       'effect' => 'fade',
       'event' => 'blur',
@@ -57,7 +63,7 @@ function islandora_solr_admin_settings(&$form_state) {
   $form['solr_ahah_wrapper']['refresh_page'] = array(
     '#type' => 'submit',
     '#value' => t('Test connection'),
-    '#attributes' => array('class' => 'refresh-button'),
+    '#attributes' => array('class' => array('refresh-button')), // in D7 the class names need to be put in an array.
     '#submit' => array('solr_admin_refresh'),
   );
 
@@ -70,17 +76,20 @@ function islandora_solr_admin_settings(&$form_state) {
     '#type' => 'select',
     '#title' => t('Request Handler'),
     '#options' => $handlers,
-    '#description' => t('Request handlers defined by !config', array('!config' => l('solrconfig.xml', 'http://wiki.apache.org/solr/SolrConfigXml' ))),
-    '#default_value' => variable_get('islandora_solr_search_block_request_handler', 'standard'),
+    '#description' => t('Request handlers defined by <a href="@link">solrconfig.xml</a>', array('@link' => 'http://wiki.apache.org/solr/SolrConfigXml')),
+    '#default_value' => variable_get('islandora_solr_search_block_request_handler', t('standard')),
   );
+
+
+
 
   $profiles = module_invoke_all("islandora_solr_primary_display");
   uksort($profiles, "sort_default_first");
-  foreach( $profiles as $machine_name => $profile ) {
+  foreach ( $profiles as $machine_name => $profile ) {
     $islandora_solr_primary_display_options[$machine_name] = $profile['name'];
   }
 
-  if( !empty( $islandora_solr_primary_display_options )) {
+  if ( !empty( $islandora_solr_primary_display_options )) {
     $form['islandora_solr_primary_display'] = array(
       '#type' => 'radios',
       '#title' => t('Default Display Profile'),
@@ -92,11 +101,11 @@ function islandora_solr_admin_settings(&$form_state) {
 
   $profiles = module_invoke_all("islandora_solr_secondary_display");
   uksort($profiles, "sort_default_first");
-  foreach( $profiles as $machine_name => $profile ) {
+  foreach ( $profiles as $machine_name => $profile ) {
     $islandora_solr_secondary_display_options[$machine_name] = $profile['name'];
   }
 
-  if( !empty( $islandora_solr_secondary_display_options )) {
+  if ( !empty( $islandora_solr_secondary_display_options )) {
     $form['islandora_solr_secondary_display'] = array(
       '#type' => 'checkboxes',
       '#title' => t('Secondary Display Profiles'),
@@ -118,7 +127,7 @@ function islandora_solr_admin_settings(&$form_state) {
     '#type' => 'textarea',
     '#title' => t('Search Terms'),
     '#description' => t('A list of fields to populate the terms dropdown for the fielded search block. An optional friendly term my be added to each solr term for a more readable display. <br />
-      Each term must be on its own line, and the solr term and the friendly term must be separated with a tilde. ie <strong>dc.title ~ Title</strong> '),
+      Each term must be on its own line, and the solr term and the friendly term must be separated with a tilde. ie <strong>dc.title ~ Title</strong>'),
     '#default_value' => variable_get('islandora_solr_searchterms', 'dc.title ~ Title'),
   );
 
@@ -149,21 +158,21 @@ function islandora_solr_admin_settings(&$form_state) {
     '#type' => 'textfield',
     '#title' => t('Minimum facet fields responses'),
     '#size' => 5,
-    '#description' => t('This param indicates the minimum counts for facet fields should be included in the response. '),
+    '#description' => t('This param indicates the minimum counts for facet fields should be included in the response.'),
     '#default_value' => variable_get('islandora_solr_search_block_facet_min_count', '2'),
   );
   $form['islandora_solr_search_block_facet_limit'] = array(
     '#type' => 'textfield',
     '#title' => t('Maximum facet field constraints'),
     '#size' => 5,
-    '#description' => t('This param indicates the maximum number of constraint counts that should be returned for the facet fields. A negative value means unlimited. '),
+    '#description' => t('This param indicates the maximum number of constraint counts that should be returned for the facet fields. A negative value means unlimited.'),
     '#default_value' => variable_get('islandora_solr_search_block_facet_limit', '10'),
   );
   $form['islandora_solr_search_num_of_results'] = array(
     '#type' => 'textfield',
     '#title' => t('Results per page'),
     '#size' => 5,
-    '#description' => t('This param indicates the number of results to show per page. '),
+    '#description' => t('This param indicates the number of results to show per page.'),
     '#default_value' => variable_get('islandora_solr_search_num_of_results', '20'),
   );
   $form['islandora_solr_search_debug_mode'] = array(
@@ -197,13 +206,13 @@ function islandora_solr_admin_settings(&$form_state) {
  */
 function solr_available($solr_url) {
   // path from url is parsed to allow graceful inclusion or exclusion of 'http://'
-  $pathParts = parse_url($solr_url);
-  $path = 'http://' . $pathParts['host'] . ':' . $pathParts['port'] . $pathParts['path'] . '/admin/file';
+  $path_parts = parse_url($solr_url);
+  $path = 'http://' . $path_parts['host'] . ':' . $path_parts['port'] . $path_parts['path'] . '/admin/file';
   $test = @fopen($path, "r");
   if ($test) {
-    return true;
+    return TRUE;
   }
-  return false;
+  return FALSE;
 }
 
 /**
@@ -219,10 +228,10 @@ function get_handlers($solr_url) {
   $xml = simplexml_load_string(curl_exec($ch));
   foreach ($xml->requestHandler as $handler) {
     if ($handler['class'] == 'solr.SearchHandler') {
-      $handlerName = (string) $handler['name'];
-      $slashed = preg_match('/^\//', $handlerName);
-      if ($handlerName != 'dismax' && $handlerName != 'partitioned' & !$slashed) {
-        $handlers[$handlerName] = $handlerName;
+      $handler_name = (string) $handler['name'];
+      $slashed = preg_match('/^\//', $handler_name);
+      if ($handler_name != 'dismax' && $handler_name != 'partitioned' & !$slashed) {
+        $handlers[$handler_name] = $handler_name;
       }
     }
   }
@@ -232,12 +241,12 @@ function get_handlers($solr_url) {
 /**
  * Checks url validity and refreshes requestHandler dropdown list
  */
-function update_solr_url_div() {
+function update_solr_url_div($form, $form_state) {
   $form = callback_prep();
   $changed_elements = $form['solr_ahah_wrapper'];
   unset($changed_elements['#prefix'], $changed_elements['#suffix']);
   $output = theme('status_messages') . drupal_render($changed_elements);
-  drupal_json(array(
+  drupal_json_output(array(
     'status' => TRUE,
     'data' => $output,
   ));
@@ -267,7 +276,7 @@ function callback_prep() {
  *
  * @param array $form
  * @param array $form_state
- * @return null
+ * @return NULL
  */
 function solr_settings_form_submit($form, &$form_state) {
 
@@ -299,7 +308,7 @@ function solr_settings_form_submit($form, &$form_state) {
   }
 
   cache_clear_all();
-  drupal_rebuild_theme_registry();
+  drupal_theme_rebuild(); // name change in D7 (D6 = drupal_rebuild_theme_registry)
 }
 
 
@@ -321,7 +330,7 @@ function solr_admin_refresh($form, &$form_state) {
  * @return <int> 
  */
 function sort_default_first($a, $b) {
-  if( !strcasecmp($a, 'default' )) return -1;
-  if( !strcasecmp($b, 'default' )) return 1;
-  return strcasecmp($a,$b);
+  if ( !strcasecmp($a, 'default' )) return -1;
+  if ( !strcasecmp($b, 'default' )) return 1;
+  return strcasecmp($a, $b);
 }
