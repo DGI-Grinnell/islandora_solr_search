@@ -23,15 +23,15 @@ function islandora_solr_search_menu() {
     'type' => MENU_CALLBACK,
   );
 
-
+/*
   $items['islandora/solr/process'] = array(
     'page callback' => 'update_solr_url_div',
     'access arguments' => array('view fedora collection'), 
     'file' => 'islandora_solr_search.admin.inc',
     'type' => MENU_CALLBACK,
   );
-
-  $items['admin/settings/islandora_solr_search'] = array(
+*/
+  $items['admin/config/islandora_solr_search'] = array(
     'title' => 'Islandora Solr Client',
     'description' => 'Managing Islandora Solr Searching',
     'page callback' => 'drupal_get_form',
@@ -45,80 +45,72 @@ function islandora_solr_search_menu() {
 
   return $items;
 }
-
 /**
- * Implementation of hook_block().
+ * Implementation of hook_block_info().
  */
-function islandora_solr_search_block($op = 'list', $delta = 0, $edit = array()) {
-  global $queryClass;
-  islandora_solr_search_init();
 
-  /*
-   * Here I need to call a hook which will return module/file/class/method/name/description
-   * for blocks which need a queryClass to render.
-   */
+function islandora_solr_search_block_info() {
+  $blocks = array();
+
   $solr_blocks = module_invoke_all("islandora_solr_query_blocks");
 
-  // The $op parameter determines what piece of information is being requested.
-  switch ($op) {
-    case 'list':
-      // If $op is "list", we just need to return a list of block descriptions.
-      // This is used to provide a list of possible blocks to the administrator,
-      // end users will not see these descriptions.
+  // Return a list of block descriptions.
+  // This is used to provide a list of possible blocks to the administrator,
+  // end users will not see these descriptions.
 
-      foreach( $solr_blocks as $name=>$block ) {
-        $blocks[$name] = array(
-          'info' => t($block['name']),
-        );
-      }
+  foreach ($solr_blocks as $name => $block ) {
+    $blocks[$name] = array(
+      'info' => t($block['name']),
+      'cache' => DRUPAL_NO_CACHE,
+    );
+  }
+  return $blocks;
+}
 
-      return $blocks;
-    case 'configure':
-      // If $op is "configure", we need to provide the administrator with a
-      // configuration form. The $delta parameter tells us which block is being
-      // configured. In this example, we'll allow the administrator to customize
-      // the text of the first block.
-      $form = array();
 
-      return $form;
-    case 'save':
-    // If $op is "save", we need to save settings from the configuration form.
-    // Since the first block is the only one that allows configuration, we
-    // need to check $delta to make sure we only save it.
 
-    case 'view': default:
-      // If $op is "view", then we need to generate the block for display
-      // purposes. The $delta parameter tells us which block is being requested.
-      if( !empty( $solr_blocks[$delta] )) {
+/**
+ * Implementation of hook_block_view().
+ */
+ 
+function islandora_solr_search_block_view($block_name = '') {
+  global $queryClass;
+  islandora_solr_search_init();
+  
+  
+  $solr_blocks = module_invoke_all("islandora_solr_query_blocks");
+    // If $op is "view", then we need to generate the block for display
+    // purposes. The $delta parameter tells us which block is being requested.
+    if (!empty($solr_blocks[$block_name])) {
 
-        // First we'll set the block title.
-        $block['subject'] = t( $solr_blocks[$delta]['name'] );
+      // First we'll set the block title.
+      $block['subject'] = t( $solr_blocks[$block_name]['name'] );
 
-        // Include the file from which the block originates.
-        require_once( drupal_get_path('module', $solr_blocks[$delta]['module']) .'/'. $solr_blocks[$delta]['file'] );
+      // Include the file from which the block originates.
+      require_once( drupal_get_path('module', $solr_blocks[$block_name]['module']) .'/'. $solr_blocks[$block_name]['file'] );
 
-        // If a class is present, instantiate it and proceed from there.
-        // The variable $queryClass (the IslandoraSolrQueryProcessor, containing
-        // the Solr search result), is fed as an argument.
-        if( !empty( $solr_blocks[$delta]['class'] ) ) {
-          $displayClass = new IslandoraSolrResults();
-          $block_function = $solr_blocks[$delta]['function'];
-          if( method_exists( $displayClass, $block_function )) {
-            $block['content'] = $displayClass->$block_function($queryClass);
-          }
-
-        // Otherwise, simply load the form.
-        } 
-        elseif( !empty( $solr_blocks[$delta]['form'] )) {
-          $block['content'] = drupal_get_form($solr_blocks[$delta]['form']);
+      // If a class is present, instantiate it and proceed from there.
+      // The variable $queryClass (the IslandoraSolrQueryProcessor, containing
+      // the Solr search result), is fed as an argument.
+      if ( !empty( $solr_blocks[$block_name]['class'] ) ) {
+        $displayClass = new IslandoraSolrResults();
+        $block_function = $solr_blocks[$block_name]['function'];
+        if ( method_exists( $displayClass, $block_function )) {
+          $block['content'] = $displayClass->$block_function($queryClass);
         }
 
+      // Otherwise, simply load the form.
+      } 
+      elseif ( !empty( $solr_blocks[$block_name]['form'] )) {
+        $block['content'] = drupal_get_form($solr_blocks[$name]['form']);
       }
-
-      return $block;
-      
-  }
+    }
+  return $block;
 }
+ 
+ 
+ 
+ 
 
 /**
  * Implementation of hook_theme().
@@ -126,9 +118,7 @@ function islandora_solr_search_block($op = 'list', $delta = 0, $edit = array()) 
 function islandora_solr_search_theme() {
   return array(
     'islandora_solr_search_block_form' => array(
-      'arguments' => array(
-        'form' => NULL,
-      ),
+      'render element' => 'form',
     ),
   );
 }
@@ -236,7 +226,7 @@ function islandora_solr_search_block_form_validate($form, &$form_state) {
 
 function islandora_solr_simple_search_form_submit($form, &$form_state) {
   $searchString = $form_state['values']['islandora_simple_search_query'];
-  $searchString = htmlspecialchars(drupal_urlencode($searchString), ENT_QUOTES, 'utf-8', false);
+  $searchString = htmlspecialchars(drupal_encode_path($searchString), ENT_QUOTES, 'utf-8', FALSE);   // D6: drupal_urlencode D7: drupal_encode_path
   $searchString = str_replace('/', '~slsh~', $searchString); //replace the slash so url doesn't break
   drupal_goto("islandora/solr/search/$searchString/-/dismax");
 }
@@ -256,6 +246,7 @@ function theme_islandora_solr_search_block_form($form) {
 
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
   $resultsClass = new IslandoraSolrResults();
+  $form = $form['form']; // in D7 the form array is nested in another array.
   return $resultsClass->theme_solr_search_form($form);
 }
 
@@ -349,7 +340,7 @@ function islandora_solr_search_block_form_submit($form, &$form_state) {
     $searchString .= $types[$iteration] . ":" . $fedora_terms[$iteration] . " " . $booleans[$iteration] . " ";
   }
   $searchString = trim($searchString);
-  $searchString = htmlspecialchars(drupal_urlencode($searchString), ENT_QUOTES, 'utf-8', false);
+  $searchString = htmlspecialchars(drupal_encode_path($searchString), ENT_QUOTES, 'utf-8', false); // D6: drupal_urlencode D7: drupal_encode_path
   $searchString = str_replace('/', '~slsh~', $searchString); //replace the slash so url doesn't break
   drupal_goto("islandora/solr/search/$searchString/-");
 }
@@ -391,7 +382,7 @@ function islandora_solr_search_help($path, $arg) {
 }
 
 function islandora_solr_search_init() {
-  if( !$islandora_solr_search_init ) {
+  if( !isset($islandora_solr_search_init) ) {
     drupal_add_css(drupal_get_path('module', 'islandora_solr_search') . '/islandora_solr_search.css');
     global $queryClass;
     if( empty( $queryClass )) {
@@ -399,4 +390,13 @@ function islandora_solr_search_init() {
     }
     $islandora_solr_search_init = true;
   }
+  
+  // I added this constant. Why I need to add it in D7 while in D6 the constant 
+  // calls worked perfect is a mystery to me. I couldn't find the constant 
+  // definition in D6. Nor in /fedora_repository, nor in /islandora_solr_search.
+  // I still had to modify the constant in the .install file to a string,
+  // because this function isn't loaded on install. I'm going to have to
+  // rethink this stuff.
+  define('Apache_Solr_Service', 'Apache_Solr_Service'); 
+
 }
