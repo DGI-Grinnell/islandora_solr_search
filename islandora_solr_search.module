@@ -45,6 +45,9 @@ function islandora_solr_search_menu() {
 
   return $items;
 }
+
+
+
 /**
  * Implementation of hook_block_info().
  */
