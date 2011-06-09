@@ -87,7 +87,8 @@ class IslandoraSolrResults {
     $output .= $this->printResults($solrQueryProcessor->solrResult);
 
     // Render Drupal pager (bottom of search results)
-    $output .= theme('pager', NULL, $solrQueryProcessor->solrLimit, 0, NULL, 5); // something is up with this.
+    $variables = array('tags' => NULL, 'limit' => $solrQueryProcessor->solrLimit, 'elements' => 0, 'parameters' => NULL, 'quantity' => 5,);
+    $output .= theme('pager', $variables); // D7 needs an array
 
 
     $output .= "</div>"; // class = "content"
@@ -310,6 +311,7 @@ class IslandoraSolrResults {
         unset($normal_facet_output);
         $filter_include = NULL;
         $filter_exclude = NULL;
+        $disable_link = NULL; // set $disable_link
         foreach ($field as $name => $number) {
           if ($islandora_fq && $islandora_fq != '-') {//there are existing facets in the query
             $disable_link = strstr($islandora_fq, $key . ':"' . replaceSlashes($name) . '"');//we don't want a link for this facet as we already used it
@@ -345,6 +347,7 @@ class IslandoraSolrResults {
             $facet_count++;
           }
         }
+        $facet_output = ''; // set $facet_output
         if ( $facet_count >= 2 ) {
           $facet_output .= '<div class="islandora_solr_search_facet">';
           $list_title = $this->facetFieldArray[$key];
@@ -421,7 +424,8 @@ class IslandoraSolrResults {
         $t = $i - 1;
         $j = $i - 2;
         $andorj = ( isset($andOrs[$j]) ? $andOrs[$j] : 'AND' );
-        $field_and_term = explode(':', $queryArray[$t]);
+        //$field_and_term = explode(':', $queryArray[$t]);
+        $field_and_term = (isset($queryArray[$t]) ? explode(':', $queryArray[$t]) : array(0 => '') );  // added to get rid of the errors, but still don't have any search results
         $form["andor$t"] = array(
           '#title' => '',
           '#type' => 'select',
