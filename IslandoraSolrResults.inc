@@ -159,7 +159,8 @@ class IslandoraSolrResults {
         '#attributes' => array('class' => 'raw-results'),
         '#children' => NULL,
       );
-      $output .= theme('fieldset', $fieldset_r);
+      //$output .= theme('fieldset', $fieldset_r);
+      $output .= $results_r;
     }
     return $output;
   }
@@ -177,11 +178,11 @@ class IslandoraSolrResults {
    */
 
   function currentQuery($solrQueryProcessor) {
-    dsm($solrQueryProcessor);
+    //dsm($solrQueryProcessor);
     global $base_url;
     $output = '';
     $islandora_fq = restoreSlashes($solrQueryProcessor->solrFilters);
-    dsm($islandora_fq);
+    //dsm($islandora_fq);
     $islandora_facets = $solrQueryProcessor->solrResult->facet_counts->facet_fields;
 
     if (strlen( trim( $solrQueryProcessor->solrQuery ) ) ) {
@@ -366,11 +367,12 @@ class IslandoraSolrResults {
     // strings. when we double-encode quotation marks they're incomprehensible to solr. //
     // This is a quick workaround:                                                      //
     //////////////////////////////////////////////////////////////////////////////////////
+    if (isset($facet_output)) {
     $facet_output = str_replace('%2B', '%252B', $facet_output);
     $output .= '<div class="islandora_solr_search_facet_wrap">';
     $output .= $facet_output;
     $output .= '</div>';
-
+    }
     return $output;
   }
 

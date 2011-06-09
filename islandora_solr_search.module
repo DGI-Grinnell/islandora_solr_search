@@ -79,7 +79,7 @@ function islandora_solr_search_block_info() {
 function islandora_solr_search_block_view($block_name = '') {
   global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
-  dsm($_islandora_solr_search_queryclass);
+  //dsm($_islandora_solr_search_queryclass);
   
   $solr_blocks = module_invoke_all("islandora_solr_query_blocks");
     // If $op is "view", then we need to generate the block for display
@@ -318,7 +318,7 @@ function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
   }
 
   if (variable_get('islandora_solr_search_debug_mode', 0)) { // debug dump
-    $message = check_markup('Params: <br/><pre>' . print_r($_islandora_solr_search_queryclass->solrParams, TRUE) . '</pre>');
+    $message = 'Params: <br/><pre>' . print_r($_islandora_solr_search_queryclass->solrParams, TRUE) . '</pre>'; // in D7 this should be checked with check_plain or check_markup, but we can't output it correctly in that case.
     drupal_set_message($message, 'status');
   }
 
