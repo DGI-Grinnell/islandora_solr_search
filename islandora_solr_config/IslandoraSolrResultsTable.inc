@@ -125,8 +125,9 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
       }
       $row++;
     }
-
-    $output .= theme_table($header,$rows,array('class'=>'islandora_solr_search_results_table'));
+    
+    $variables = array('header' => $header, 'rows' => $rows, 'attributes' => array('class'=>'islandora_solr_search_results_table'), 'caption' => NULL, 'colgroups' => NULL, 'sticky' => FALSE, 'empty' => t('Your search yielded no results'));
+    $output .= theme_table($variables);
 
     if( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
       $results_r .= "<pre>Results: ".print_r($results,true)."</pre>";

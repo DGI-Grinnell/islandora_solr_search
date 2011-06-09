@@ -4,8 +4,8 @@ module_load_include('inc', 'islandora_solr_search', 'islandora_solr_search.admin
 module_load_include('inc', 'islandora_solr_search', 'includes/common');
 module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrQueryProcessor');
 
-//$islandora_query;
-$queryClass;
+//$_islandora_solr_search_query;
+$_islandora_solr_search_queryclass;
 $islandora_solr_search_init = FALSE;
 
 /**
@@ -77,9 +77,9 @@ function islandora_solr_search_block_info() {
  */
  
 function islandora_solr_search_block_view($block_name = '') {
-  global $queryClass;
+  global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
-  
+  dsm($_islandora_solr_search_queryclass);
   
   $solr_blocks = module_invoke_all("islandora_solr_query_blocks");
     // If $op is "view", then we need to generate the block for display
@@ -93,13 +93,15 @@ function islandora_solr_search_block_view($block_name = '') {
       require_once(drupal_get_path('module', $solr_blocks[$block_name]['module']) . '/' . $solr_blocks[$block_name]['file'] );
 
       // If a class is present, instantiate it and proceed from there.
-      // The variable $queryClass (the IslandoraSolrQueryProcessor, containing
+      // The variable $_islandora_solr_search_queryclass (the IslandoraSolrQueryProcessor, containing
       // the Solr search result), is fed as an argument.
       if ( !empty( $solr_blocks[$block_name]['class'] ) ) {
         $displayClass = new IslandoraSolrResults();
         $block_function = $solr_blocks[$block_name]['function'];
         if ( method_exists( $displayClass, $block_function )) {
-          $block['content'] = $displayClass->$block_function($queryClass);
+          if ($_islandora_solr_search_queryclass->solrQuery != NULL) {
+            $block['content'] = $displayClass->$block_function($_islandora_solr_search_queryclass);
+          }
         }
 
       // Otherwise, simply load the form.
@@ -236,17 +238,17 @@ function islandora_solr_simple_search_form_submit($form, &$form_state) {
 }
 
 function islandora_solr_search_block_form() {
-  global $queryClass;
+  global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
   $resultsClass = new IslandoraSolrResults();
-  //dsm($resultsClass->build_solr_search_form(NULL, NULL, $queryClass->solrQuery));
-  return $resultsClass->build_solr_search_form(NULL, NULL, $queryClass->solrQuery);
+  //dsm($resultsClass->build_solr_search_form(NULL, NULL, $_islandora_solr_search_queryclass->solrQuery));
+  return $resultsClass->build_solr_search_form(NULL, NULL, $_islandora_solr_search_queryclass->solrQuery);
 }
 
 function theme_islandora_solr_search_block_form($form) {
-  global $queryClass;
+  global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
   module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
@@ -258,11 +260,11 @@ function theme_islandora_solr_search_block_form($form) {
 }
 
 function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
-  global $queryClass;
+  global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
   // Build and execute Apache Solr query
-  $queryResult = $queryClass->buildAndExecuteQuery($query, $fq, $dismax);
+  $queryResult = $_islandora_solr_search_queryclass->buildAndExecuteQuery($query, $fq, $dismax);
 
   // Get the preferred display profile
   // Order: First choice is what's in the ?profile query var
@@ -303,7 +305,7 @@ function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
   }
 
   if (!$nope && method_exists($implementation, $solrFunction)) {
-    $output = $implementation->$solrFunction($queryClass);
+    $output = $implementation->$solrFunction($_islandora_solr_search_queryclass); // something is up with this.
   }
   else {
     $nope = TRUE;
@@ -312,11 +314,11 @@ function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
   if ($nope) {
     module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
     $resultsClass = new IslandoraSolrResults();
-    $output = $resultsClass->displayResults($queryClass);
+    $output = $resultsClass->displayResults($_islandora_solr_search_queryclass);
   }
 
   if (variable_get('islandora_solr_search_debug_mode', 0)) { // debug dump
-    $message = check_markup('Params: <br/><pre>' . print_r($queryClass->solrParams, TRUE) . '</pre>');
+    $message = check_markup('Params: <br/><pre>' . print_r($_islandora_solr_search_queryclass->solrParams, TRUE) . '</pre>');
     drupal_set_message($message, 'status');
   }
 
@@ -327,7 +329,7 @@ function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
 }
 
 function islandora_solr_search_block_form_submit($form, &$form_state) {
-  global $queryClass;
+  global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
   $type_id = trim($form_state['values']['type']);
@@ -395,9 +397,9 @@ function islandora_solr_search_help($path, $arg) {
 function islandora_solr_search_init() {
   if ( !isset($islandora_solr_search_init) ) {
     drupal_add_css(drupal_get_path('module', 'islandora_solr_search') . '/islandora_solr_search.css');
-    global $queryClass;
-    if ( empty( $queryClass )) {
-      $queryClass = new IslandoraSolrQueryProcessor();
+    global $_islandora_solr_search_queryclass;
+    if ( empty( $_islandora_solr_search_queryclass )) {
+      $_islandora_solr_search_queryclass = new IslandoraSolrQueryProcessor();
     }
     $islandora_solr_search_init = TRUE;
   }

@@ -87,7 +87,7 @@ class IslandoraSolrResults {
     $output .= $this->printResults($solrQueryProcessor->solrResult);
 
     // Render Drupal pager (bottom of search results)
-    $output .= theme('pager', NULL, $solrQueryProcessor->solrLimit, 0, NULL, 5);
+    $output .= theme('pager', NULL, $solrQueryProcessor->solrLimit, 0, NULL, 5); // something is up with this.
 
 
     $output .= "</div>"; // class = "content"
@@ -108,6 +108,7 @@ class IslandoraSolrResults {
     $title = NULL;
     $recordStart = $results->response->start;
     $limitResults = variable_get('islandora_solr_search_limit_result_fields', 0);
+    $output = '';
 
     global $base_url;
     if (empty($results)) {
@@ -142,16 +143,20 @@ class IslandoraSolrResults {
         }
         $row++;
       }
-      $items[] = theme_table(NULL, $rows, array('class' => 'islandora_solr_search_results_object'));
+      $variables = array('header' => NULL, 'rows' => $rows, 'attributes' => array('class' => 'islandora_solr_search_results_object'), 'caption' => NULL, 'colgroups' => NULL, 'sticky' => FALSE, 'empty' => t('Your search yielded no results'));
+      $items[] = theme_table($variables); // theme_table requires an array in D7
     }
-    $output .= theme_item_list($items, $title, $type, array('class' => 'stuff', 'start' => ($recordStart + 1)));
+    $variables = array('items' => $items, 'title' => $title, 'type' => $type, 'attributes' => array('class' => 'stuff', 'start' => ($recordStart + 1)) );
+    $output .= theme_item_list($variables); // D7 requires an array for theme_item_list
     if (variable_get('islandora_solr_search_debug_mode', 0)) { // debug dump
-      $results_r .= "<pre>Results: " . print_r($results, TRUE) . "</pre>";
+      $results_r = "<pre>Results: " . print_r($results, TRUE) . "</pre>";
       $fieldset_r = array(
         '#title' => t("Raw Results"),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
         '#value' => $results_r,
+        '#attributes' => array('class' => 'raw-results'),
+        '#children' => NULL,
       );
       $output .= theme('fieldset', $fieldset_r);
     }
@@ -171,9 +176,11 @@ class IslandoraSolrResults {
    */
 
   function currentQuery($solrQueryProcessor) {
+    dsm($solrQueryProcessor);
     global $base_url;
     $output = '';
     $islandora_fq = restoreSlashes($solrQueryProcessor->solrFilters);
+    dsm($islandora_fq);
     $islandora_facets = $solrQueryProcessor->solrResult->facet_counts->facet_fields;
 
     if (strlen( trim( $solrQueryProcessor->solrQuery ) ) ) {
@@ -195,7 +202,8 @@ class IslandoraSolrResults {
 
       $output .= '<div class="islandora_solr_search_query_wrap">';
 
-      $output .= theme_item_list($query_list_items, $query_list_title, $query_list_type, $query_list_attributes);
+      $variables = array('items' => $query_list_items, 'title' => $query_list_title, 'type' => $query_list_type, 'attributes' => $query_list_attributes);
+      $output .= theme_item_list($variables); // D7 requires an array for theme_item_list
       $output .= '</div>'; // 'islandora_solr_search_query_wrap'
     }
 
@@ -241,7 +249,8 @@ class IslandoraSolrResults {
     if (!empty($filter_list_items)) {
 //      $filter_output = str_replace('%2B','%252B',$filter_output);
       $output .= '<div class="islandora_solr_search_filter_wrap">';
-      $output .= theme_item_list($filter_list_items, $filter_list_title, $filter_list_type, $filter_list_attributes);
+      $variables = array('items' => $filter_list_items, 'title' => $filter_list_title, 'type' => $filter_list_type, 'attributes' => $filter_list_attributes);
+      $output .= theme_item_list($variables); // D7 requires an array for theme_item_list
       $output .= '</div>'; // 'islandora_solr_search_filter_wrap'
     }
 
@@ -341,7 +350,8 @@ class IslandoraSolrResults {
           $list_title = $this->facetFieldArray[$key];
           $list_type = "ul";
           $list_attributes = array('class' => 'islandora_solr_search_facet_list facet_list');
-          $facet_output .= theme_item_list($list_items, $list_title, $list_type, $list_attributes);
+          $variables = array('items' => $list_items, 'title' => $list_title, 'type' => $list_type, 'attributes' => $list_attributes);
+          $facet_output .= theme_item_list($variables); // D7 requires an array for theme_item_list
           $facet_output .= '</div>';
         }
       }
@@ -441,9 +451,9 @@ class IslandoraSolrResults {
   }
 
   function build_simple_solr_form() {
-    global $islandora_query;
-    if (!strpos($islandora_query, ':')) {
-      $default = $islandora_query;
+    global $_islandora_solr_search_query;
+    if (!strpos($_islandora_solr_search_query, ':')) {
+      $default = $_islandora_solr_search_query;
     }
     // TODO: Fix the above.  The global is no longer valid, and the test is not conclusive.  Should instead test for deftype=dismax.
     $form["islandora_simple_search_query"] = array(
