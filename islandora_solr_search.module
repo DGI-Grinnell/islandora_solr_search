@@ -39,7 +39,7 @@ function islandora_solr_search_menu() {
 /**
  * Implements hook_admin_paths().
  */
-function devel_admin_paths() {
+function islandora_solr_search_admin_paths() {
   $paths = array(
     'admin/config/islandora_solr_search' => TRUE,
   );
