@@ -46,6 +46,7 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
     $values = array();
     $header = array();
     $limitResults = variable_get('islandora_solr_search_limit_result_fields', 0);
+    $output = '';
 
     $object_link_placeholder = "~object_href~";
 
@@ -130,14 +131,15 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
     $output .= theme_table($variables);
 
     if( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
-      $results_r .= "<pre>Results: ".print_r($results,true)."</pre>";
+      $results_r = "<pre>Results: ".print_r($results,true)."</pre>";
       $fieldset_r = array(
         '#title' => t("Raw Results"),                                                                                                                                             
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
         '#value' => $results_r,
         );
-      $output .= theme('fieldset', $fieldset_r);
+      // $output .= theme('fieldset', $fieldset_r);
+      $output .= $fieldset_r;
     }
     return $output;
   }
