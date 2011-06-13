@@ -1,6 +1,7 @@
-<?php
+<?php // $Id$
 
-/*
+/**
+ * @file
  * contains methods to search solr and display results.  depends on Apache_Solr_Php client.
  */
 
@@ -35,10 +36,10 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
    *   html output for the resultset. Note: we currently create this 
    *   output manually, should refactor to use drupal forms api.
    */
-  function printResults($results){
+  function printResults($results) {
     global $base_url;
     $recordStart = (int)$results->response->start;
-    if(empty($results)) {
+    if (empty($results)) {
       return "no results";
     }
     $count = 0;
@@ -50,16 +51,16 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
 
     $object_link_placeholder = "~object_href~";
 
-    foreach($results->response->docs as $doc) {
+    foreach ($results->response->docs as $doc) {
       unset($pid);
-      foreach($doc as $field => $value) {
+      foreach ($doc as $field => $value) {
 
-        if( $limitResults && empty($this->resultFieldArray[$field] ) ) {
+        if ( $limitResults && empty($this->resultFieldArray[$field] ) ) {
           continue;
         }
 
         // catches the object PID.
-        if($field=='PID') {
+        if ($field == 'PID') {
           $pid = $value;
           // we need this in the resultset, but would prefer to hide it from users.
         }
@@ -67,19 +68,19 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
         // Sometimes we get a single value, sometimes an array.  
         // For simplicity, I push the singles into an array and later on process each
         // field as an array.
-        if(!is_array($value)) {
+        if (!is_array($value)) {
           $value = array($value);
         }
 
         // We're going to put the object link onto the dublin-core title.
-        if($field=='dc.title' || $field=='dc:title') {
-          foreach ($value as $key=>$val) {
-            if(isset($doc->PID)) {
-              $value[$key] = l($val,'fedora/repository/'.$doc->PID.'/-/'.$val);
+        if ($field == 'dc.title' || $field == 'dc:title') {
+          foreach ($value as $key => $val) {
+            if (isset($doc->PID)) {
+              $value[$key] = l($val, 'fedora/repository/' . $doc->PID . '/-/' . $val);
             }
           }
         }
-        $value = implode(", ",$value);
+        $value = implode(", ", $value);
 
         //this would change 'animal_name' to the more readable 'Animal Name'
         //$field = ucwords( str_replace( '_', ' ', $field ) );
@@ -94,18 +95,18 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
       $count++;
     }
 
-    foreach( $fields as $field ) {
+    foreach ( $fields as $field ) {
       // Get human-friendly field names;
       $translated_field_name = isset($this->allSubsArray[$field]) ? $this->allSubsArray[$field] : $field;
       $field_array = array(
         'data' => $translated_field_name,
-        'field' => null,
-        'sort' => null,
+        'field' => NULL,
+        'sort' => NULL,
         'title' => $field,
       );
       $header[] = $field_array;
     }
-    array_unshift($header,'#');
+    array_unshift($header, '#');
     
     $rows = array();
     $row = 0;
@@ -114,24 +115,25 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
       unset($rowclass);
       $result_num = $recordStart + $num + 1;
       $rows[$row][] = array(
-        'data' => (isset($val_array['PID']) ? l($result_num,'fedora/repository/'.$val_array['PID']) : $result_num),
-        'header' => true,
+        'data' => (isset($val_array['PID']) ? l($result_num, 'fedora/repository/' . $val_array['PID']) : $result_num),
+        'header' => TRUE,
       );
       foreach ($fields as $field) {
         if (isset ($val_array[$field])) {
           $rows[$row][] = $val_array[$field];
-        } else {
+        }
+        else {
           $rows[$row][] = '';
         }
       }
       $row++;
     }
     
-    $variables = array('header' => $header, 'rows' => $rows, 'attributes' => array('class'=>'islandora_solr_search_results_table'), 'caption' => NULL, 'colgroups' => NULL, 'sticky' => FALSE, 'empty' => t('Your search yielded no results'));
+    $variables = array('header' => $header, 'rows' => $rows, 'attributes' => array('class' => 'islandora_solr_search_results_table'), 'caption' => NULL, 'colgroups' => NULL, 'sticky' => FALSE, 'empty' => t('Your search yielded no results'));
     $output .= theme_table($variables);
 
-    if( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
-      $results_r = "<pre>Results: ".print_r($results,true)."</pre>";
+    if ( variable_get('islandora_solr_search_debug_mode', 0) ) { // debug dump
+      $results_r = "<pre>Results: " . print_r($results, TRUE) . "</pre>";
       $fieldset_r = array(
         '#title' => t("Raw Results"),                                                                                                                                             
         '#collapsible' => TRUE,
