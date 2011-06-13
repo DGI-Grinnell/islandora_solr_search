@@ -32,20 +32,20 @@ function islandora_solr_admin_settings($form, &$form_state) {
   $config_options = array();
   //               module_name          file_name                 class_name           display_method
   $config_options['islandora_solr_search~IslandoraSolrResults.inc~IslandoraSolrResults~displayResults'] = 'Default';
-  $confirmation_message = ($solr_avail ? '<img src="' . url('misc/watchdog-ok.png') . '"/>'
-          . t('Successfully connected to Solr server at !islandora_solr_search_block_url', array('!islandora_solr_search_block_url' => $solr_url)) : '<img src="'
+  $confirmation_message = ($solr_avail ? '<p><img src="' . url('misc/watchdog-ok.png') . '"/>'
+          . t('Successfully connected to Solr server at !islandora_solr_search_block_url', array('!islandora_solr_search_block_url' => $solr_url)) : '<p><img src="'
           . url('misc/watchdog-error.png') . '"/> '
           . t('Unable to connect to Solr server at !islandora_solr_search_block_url</p>', array('!islandora_solr_search_block_url' => $solr_url)));
-
+  
   $form = array();
 
-  $form['solr_ahah_wrapper'] = array(
+  $form['solr_ajax_wrapper'] = array(
     '#prefix' => '<div id="solr-url">',
     '#suffix' => '</div>',
     '#type' => 'fieldset',
   );
 
-  $form['solr_ahah_wrapper']['islandora_solr_search_block_url'] = array(
+  $form['solr_ajax_wrapper']['islandora_solr_search_block_url'] = array(
     '#type' => 'textfield',
     '#title' => t('Solr url'),
     '#size' => 40,
@@ -57,22 +57,23 @@ function islandora_solr_admin_settings($form, &$form_state) {
       'wrapper' => 'solr-url',
       'effect' => 'fade',
       'event' => 'blur',
+      //'progress' => array('type' => 'none'), // don't show progress throbber
     ),
   );
 
-  $form['solr_ahah_wrapper']['refresh_page'] = array(
+  $form['solr_ajax_wrapper']['refresh_page'] = array(
     '#type' => 'submit',
     '#value' => t('Test connection'),
     '#attributes' => array('class' => array('refresh-button')), // in D7 the class names need to be put in an array.
     '#submit' => array('solr_admin_refresh'),
   );
 
-  $form['solr_ahah_wrapper']['infobox'] = array(
+  $form['solr_ajax_wrapper']['infobox'] = array(
     '#type' => 'item',
-    '#value' => $confirmation_message,
+    '#markup' => $confirmation_message,
   );
 
-  $form['solr_ahah_wrapper']['islandora_solr_search_block_request_handler'] = array(
+  $form['solr_ajax_wrapper']['islandora_solr_search_block_request_handler'] = array(
     '#type' => 'select',
     '#title' => t('Request Handler'),
     '#options' => $handlers,
@@ -242,35 +243,19 @@ function get_handlers($solr_url) {
  * Checks url validity and refreshes requestHandler dropdown list
  */
 function update_solr_url_div($form, $form_state) {
-  $form = callback_prep();
-  $changed_elements = $form['solr_ahah_wrapper'];
-  unset($changed_elements['#prefix'], $changed_elements['#suffix']);
-  $output = theme('status_messages') . drupal_render($changed_elements);
-  drupal_json_output(array(
-    'status' => TRUE,
-    'data' => $output,
-  ));
+
+  return $form['solr_ajax_wrapper']; // man, this is easy :)
 }
 
-/**
- *
- * @return array
- * Utilty function to prep $form_state for ahah
- */
-function callback_prep() {
-  $form_state = array('storage' => NULL, 'submitted' => FALSE);
-  $form_build_id = $_POST['form_build_id'];
-  $form = form_get_cache($form_build_id, $form_state);
-  $args = $form['#parameters'];
-  $form_id = array_shift($args);
-  $form_state['post'] = $form['#post'] = $_POST;
-  // Enable the submit/validate handlers to determine whether AHAH-submittted.
-  $form_state['ahah_submission'] = TRUE;
-  $form['#programmed'] = $form['#redirect'] = FALSE;
-  drupal_process_form($form_id, $form, $form_state);
-  $form = drupal_rebuild_form($form_id, $form_state, $args, $form_build_id);
-  return $form;
+
+
+function solr_admin_refresh($form, &$form_state) {
+  $values = $form_state['values'];
+  unset($form_state['submit_handlers']);
+  form_execute_handlers('submit', $form, $form_state);
+  $form_state['rebuild'] = TRUE;
 }
+
 
 /**
  *
@@ -312,12 +297,7 @@ function solr_settings_form_submit($form, &$form_state) {
 }
 
 
-function solr_admin_refresh($form, &$form_state) {
-  $values = $form_state['values'];
-  unset($form_state['submit_handlers']);
-  form_execute_handlers('submit', $form, $form_state);
-  $form_state['rebuild'] = TRUE;
-}
+
 
 /**
  * Function sort_default_first

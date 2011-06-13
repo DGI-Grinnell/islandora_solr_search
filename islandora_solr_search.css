@@ -92,3 +92,10 @@ html.js .refresh-button {
 .strikethrough {
   text-decoration: line-through !important;
 }
+
+.ajax-progress-throbber,
+.form-item-islandora-solr-search-block-url .description
+{
+  float: left;
+  width: 100%;
+}
