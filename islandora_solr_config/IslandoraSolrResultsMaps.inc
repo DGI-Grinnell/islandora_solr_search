@@ -1,6 +1,7 @@
-<?php
+<?php // $Id$
 
-/*
+/**
+ * @file
  * contains methods to search solr and display results.  depends on Apache_Solr_Php client.
  */
 
@@ -13,8 +14,8 @@ module_load_include('inc', 'islandora_solr_search', 'IslandoraSolrResults');
 
 class IslandoraSolrResultsMaps extends IslandoraSolrResults {
 
-  static $facetSeparator = '~';//used to separate facets in url
-  static $slashReplacement = '~slsh~';// a pattern used to replace / in url's the slash breaks drupal clean url's
+  static $facetSeparator = '~'; // used to separate facets in url
+  static $slashReplacement = '~slsh~'; // a pattern used to replace / in url's the slash breaks drupal clean url's
   public static $SEARCH_CLASS_ADVANCED_SEARCH_NUMBER_FIELDS = 5;
   function IslandoraSolrResultsMaps() {
     parent::__construct();
@@ -32,7 +33,7 @@ class IslandoraSolrResultsMaps extends IslandoraSolrResults {
    *   output manually, should refactor to use drupal forms api.
    */
   function printResults($results) {
-    $output.= '<ol start="' . ($recordStart + 1) . '">';
+    $output .= '<ol start="' . ($recordStart + 1) . '">';
     global $base_url;
     if (empty($results)) {
       return "no results";
@@ -41,7 +42,7 @@ class IslandoraSolrResultsMaps extends IslandoraSolrResults {
     foreach ($results->response->docs as $doc) {
       $output .= '<li><table>';
       $rowspan = 0;
-      $pidValue = null;
+      $pidValue = NULL;
       $output .= '<tr>';
       $output .= '<td ><img src="' . $base_url . '/fedora/repository/' . htmlspecialchars($doc->PID, ENT_QUOTES, 'utf-8') . '/TN"/></td>';
       $output .= '<td><table>';
@@ -54,8 +55,9 @@ class IslandoraSolrResultsMaps extends IslandoraSolrResults {
         }
         if ($field == 'PID') {
           $pidValue = $value;
-          $output.='<td><a href="' . $base_url . '/fedora/repository/' . htmlspecialchars($value, ENT_QUOTES, 'utf-8') . '">' . $value . '</td></tr>';
-        } else {
+          $output .= '<td><a href="' . $base_url . '/fedora/repository/' . htmlspecialchars($value, ENT_QUOTES, 'utf-8') . '">' . $value . '</td></tr>';
+        }
+        else {
           $output .= '<td>' . $value . '</td></tr>';
         }
       }
