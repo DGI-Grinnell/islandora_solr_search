@@ -1,11 +1,14 @@
 ; $Id$
 name = Islandora Solr Search
+description = searches a solr index
+package = Fedora Repository
+configure = admin/config/islandora_solr_search
+
 #dependencies[] = fedora_repository
 files[] islandora_solr_search.module
 files[] IslandoraSolrResults.inc
 files[] islandora_solr_search.admin.inc
 files[] islandora_solr_search.install
-description = searches a solr index
-package = Fedora Repository
+
 version = 7.1dev
 core = 7.x
