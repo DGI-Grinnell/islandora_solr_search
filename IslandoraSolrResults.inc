@@ -61,8 +61,11 @@ class IslandoraSolrResults {
       foreach ( $secondary_display_profiles as $name => $profile ) {
         $attributes = array('title' => $profile['description']);
         $query = array();
-        $query[] = drupal_query_string_encode(array('solr_profile' => $name));
-        $output .= l( $profile['logo'], $_GET['q'], array('attributes' => $attributes, 'html' => TRUE, 'query' => count($query) ? implode('&', $query) : NULL));
+        // In D7 drupal_query_string_encode is replaced by drupal_http_build_query(array $query, $parent = '') .
+        // That said, in D7, drupal_http_build_query is added to the l() function,
+        // so the array that was first processed in D6 with drupal_query_string_encode, can now be added to the l() function directly.
+        // $query[] = drupal_http_build_query( array('solr_profile' => $name), $parent = '');
+        $output .= l( $profile['logo'], $_GET['q'], array('attributes' => $attributes, 'html' => TRUE, 'query' => array('solr_profile' => $name)));
       }
 
       $output .= "</div>";
