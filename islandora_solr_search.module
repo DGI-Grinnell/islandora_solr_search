@@ -23,14 +23,6 @@ function islandora_solr_search_menu() {
     'type' => MENU_CALLBACK,
   );
 
-/*
-  $items['islandora/solr/process'] = array(
-    'page callback' => 'update_solr_url_div',
-    'access arguments' => array('view fedora collection'), 
-    'file' => 'islandora_solr_search.admin.inc',
-    'type' => MENU_CALLBACK,
-  );
-*/
   $items['admin/config/islandora_solr_search'] = array(
     'title' => 'Islandora Solr Client',
     'description' => 'Managing Islandora Solr Searching',
@@ -40,12 +32,19 @@ function islandora_solr_search_menu() {
     'file' => 'islandora_solr_search.admin.inc',
     'type' => MENU_NORMAL_ITEM,
   );
-
-
-
   return $items;
 }
 
+
+/**
+ * Implements hook_admin_paths().
+ */
+function devel_admin_paths() {
+  $paths = array(
+    'admin/config/islandora_solr_search' => TRUE,
+  );
+  return $paths;
+}
 
 
 /**
