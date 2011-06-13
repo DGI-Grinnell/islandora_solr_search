@@ -139,7 +139,7 @@ class IslandoraSolrResultsTable extends IslandoraSolrResults {
         '#value' => $results_r,
         );
       // $output .= theme('fieldset', $fieldset_r);
-      $output .= $fieldset_r;
+      $output .= $results_r;
     }
     return $output;
   }
