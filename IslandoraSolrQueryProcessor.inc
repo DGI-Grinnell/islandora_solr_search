@@ -62,7 +62,7 @@ class IslandoraSolrQueryProcessor {
     // -- end cut here --
 
     //fix the query as some characters will break the search : and / slash are examples
-    $this->solrQuery = restoreSlashes($query);
+    $this->solrQuery = restore_slashes($query);
     
     if (empty($this->solrQuery)) {
     // $this->solrQuery = '%20'; //so we can allow empty queries to dismax
@@ -91,10 +91,10 @@ class IslandoraSolrQueryProcessor {
     $debugQuery = (variable_get('islandora_solr_search_debug_mode', 0) ? "true" : null ); //any val incl. 'false' is treated as true by Solr
 
     if ($fq != NULL && $fq != '-') {
-      $fq = restoreSlashes($fq); //put the slash back
+      $fq = restore_slashes($fq); //put the slash back
       $fqs = csv_explode(IslandoraSolrQueryProcessor::$facetSeparator,$fq,'"',true);//to filter by more then one facet we will separate them by~ for nowseparate them by~ for now
       $this->solrParams['fq'] = $fqs;
-      $islandora_fq = replaceSlashes($fq); //remove the slash here as we will be using this in url's
+      $islandora_fq = replace_slashes($fq); //remove the slash here as we will be using this in url's
     }
     if (empty($islandora_fq)) {
       $islandora_fq = '-';
@@ -106,12 +106,12 @@ class IslandoraSolrQueryProcessor {
     $this->solrStart = max(0, $startPage) * $this->solrLimit;
 
     // The breadcrumb should go in the display class
-    $queryurl = "islandora/solr/search/".replaceSlashes($this->solrQuery);
+    $queryurl = "islandora/solr/search/".replace_slashes($this->solrQuery);
     $breadcrumb_fq = $islandora_fq;
     if (strcmp($islandora_fq,"-")) {
       foreach( csv_explode(IslandoraSolrQueryProcessor::$facetSeparator,$islandora_fq,'"',true) as $facet ) {
         $field = substr($facet,0,strpos($facet,":"));
-        $value = restoreSlashes(trim(substr($facet,strpos($facet,":")+1),'"'));
+        $value = restore_slashes(trim(substr($facet,strpos($facet,":")+1),'"'));
         $options = array('html'=>true);
         $options['attributes']['title'] = $facet;
         $crumblink = $queryurl . "/" . $breadcrumb_fq . (empty($this->solrDefType) ? '' : '/'.$this->solrDefType);

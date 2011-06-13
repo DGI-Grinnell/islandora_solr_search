@@ -87,7 +87,7 @@ class IslandoraSolrResults {
     $output .= $this->printResults($solrQueryProcessor->solrResult);
 
     // Render Drupal pager (bottom of search results)
-    $variables = array('tags' => NULL, 'limit' => $solrQueryProcessor->solrLimit, 'elements' => 0, 'parameters' => NULL, 'quantity' => 5,);
+    $variables = array('tags' => NULL, 'limit' => $solrQueryProcessor->solrLimit, 'elements' => 0, 'parameters' => NULL, 'quantity' => 5, );
     $output .= theme('pager', $variables); // D7 needs an array
 
 
@@ -181,7 +181,7 @@ class IslandoraSolrResults {
     //dsm($solrQueryProcessor);
     global $base_url;
     $output = '';
-    $islandora_fq = restoreSlashes($solrQueryProcessor->solrFilters);
+    $islandora_fq = restore_slashes($solrQueryProcessor->solrFilters);
     //dsm($islandora_fq);
     $islandora_facets = $solrQueryProcessor->solrResult->facet_counts->facet_fields;
 
@@ -198,7 +198,7 @@ class IslandoraSolrResults {
       // and allow one part to be removed at a time.
       $query_list_items[] .= l(
         '<img class="islandora_solr_add_remove_link" src="' . $base_url . '/' . drupal_get_path('module', 'islandora_solr_search') . '/images/delete.png" alt="Remove search term">',
-        'islandora/solr/search/' . " " . '/' . replaceSlashes($islandora_fq) . '/dismax',
+        'islandora/solr/search/' . " " . '/' . replace_slashes($islandora_fq) . '/dismax',
         array('html' => TRUE)
       ) . ' ' . stripslashes($solrQueryProcessor->solrQuery);
 
@@ -242,7 +242,7 @@ class IslandoraSolrResults {
         }
         $filter_list_items[] = l(
           '<img class="islandora_solr_add_remove_link" src="' . $base_url . '/' . drupal_get_path('module', 'islandora_solr_search') . '/images/delete.png" alt="Remove this filter">',
-          'islandora/solr/search/' . replaceSlashes($solrQueryProcessor->solrQuery) . '/' . replaceSlashes($filter_disable) . '/' . $solrQueryProcessor->solrDefType,
+          'islandora/solr/search/' . replace_slashes($solrQueryProcessor->solrQuery) . '/' . replace_slashes($filter_disable) . '/' . $solrQueryProcessor->solrDefType,
           array('html' => TRUE)
         ) . ' ' . $this->facetFieldArray[$filter_name] . ($exclude ? ' != ' : ' = ') . $filter_value;
       }
@@ -315,7 +315,7 @@ class IslandoraSolrResults {
         $disable_link = NULL; // set $disable_link
         foreach ($field as $name => $number) {
           if ($islandora_fq && $islandora_fq != '-') {//there are existing facets in the query
-            $disable_link = strstr($islandora_fq, $key . ':"' . replaceSlashes($name) . '"');//we don't want a link for this facet as we already used it
+            $disable_link = strstr($islandora_fq, $key . ':"' . replace_slashes($name) . '"');//we don't want a link for this facet as we already used it
             if ($disable_link) { 
               //don't show link to this facet but include a link to remove it
             }
@@ -328,8 +328,8 @@ class IslandoraSolrResults {
             $filter_include = $key . ':' . '"' . $name . '"';
             $filter_exclude = '-' . $key . ':' . '"' . $name . '"';
           }
-          $filter_include = replaceSlashes($filter_include);//replace the slash so url does not break
-          $filter_exclude = replaceSlashes($filter_exclude);//replace the slash so url does not break
+          $filter_include = replace_slashes($filter_include);//replace the slash so url does not break
+          $filter_exclude = replace_slashes($filter_exclude);//replace the slash so url does not break
           if ($disable_link) {
             // we don't want to create a link, because we're already filtering on this value.
             // Links to remove enabled facet filters are created down below.
@@ -419,7 +419,7 @@ class IslandoraSolrResults {
             '#size' => '24',
             '#type' => 'textfield',
             '#title' => '',
-            '#default_value' => (count($var0) >= 2 ? restoreSlashes(trim($var0[1], '()')) : ''),
+            '#default_value' => (count($var0) >= 2 ? restore_slashes(trim($var0[1], '()')) : ''),
     );
     if ($repeat > 1 && $repeat < 9) { //don't want less then 2 or more then 9
       for ($i = 2; $i < $repeat + 1; $i++) {
@@ -512,7 +512,7 @@ class IslandoraSolrResults {
     $port = variable_get('islandora_solr_search_block_port', '8080');
     $appName = variable_get('islandora_solr_search_block_app_name', 'solr');
     $solr = new Apache_Solr_Service($host, $port, '/' . $appName . '/');
-    $query = restoreSlashes($query); //fix the query as some characters will break the search : and / slash are examples
+    $query = restore_slashes($query); //fix the query as some characters will break the search : and / slash are examples
     $facetlimit = variable_get('islandora_solr_search_block_facet_limit', '12');
     $facetMinCount = variable_get('islandora_solr_search_block_facet_min_count', '2');
     $requestHandler = variable_get("islandora_solr_search_block_request_handler", "standard");

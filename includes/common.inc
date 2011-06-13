@@ -1,12 +1,13 @@
-<?php
+<?php // $Id$
 
-/*
+/**
+ * @file
  * Contains some non-class-specific methods and things I'm not sure where to put.
  */
 
-$facetSeparator = '~';
-$replacements = array("~slsh~","~plus~");
-$values = array("/","+");
+$facet_separator = '~';
+$replacements = array("~slsh~", "~plus~");
+$values = array("/", "+");
 
 
 /**
@@ -43,34 +44,35 @@ function islandora_solr_search_pager_init($total, $limit = 10, $element = 0) {
   return $pager_page_array[$element];
 }
 
-function restoreSlashes($str) {
-  $replacements = array("~slsh~","~plus~");
-  $values = array("/","+");
-  return str_replace($replacements,$values,$str); //can't have a slash in the url breaks drupal clean urls
+function restore_slashes($str) {
+  $replacements = array("~slsh~", "~plus~");
+  $values = array("/", "+");
+  return str_replace($replacements, $values, $str); //can't have a slash in the url breaks drupal clean urls
 }
 
-function replaceSlashes($str) {
-  $replacements = array("~slsh~","~plus~");
-  $values = array("/","+");
-  return str_replace($values,$replacements,$str); // reverse of above
+function replace_slashes($str) {
+  $replacements = array("~slsh~", "~plus~");
+  $values = array("/", "+");
+  return str_replace($values, $replacements, $str); // reverse of above
 }
 
 
 //a better explode method allows quotes in the returned strings.  taken from the php.net site
-function csv_explode($delim=',', $str, $enclose='"', $preserve=false) {
-  $resArr = array();
+function csv_explode($delim = ',', $str, $enclose = '"', $preserve = FALSE) {
+  $res_arr = array();
   $n = 0;
-  $expEncArr = explode($enclose, $str);
-  foreach($expEncArr as $EncItem) {
-    if($n++%2) {
-      array_push($resArr, array_pop($resArr) . ($preserve?$enclose:'') . $EncItem.($preserve?$enclose:''));
-    }else {
-      $expDelArr = explode($delim, $EncItem);
-      array_push($resArr, array_pop($resArr) . array_shift($expDelArr));
-      $resArr = array_merge($resArr, $expDelArr);
+  $exp_enc_arr = explode($enclose, $str);
+  foreach ($exp_enc_arr as $enc_item) {
+    if ($n++%2) {
+      array_push($res_arr, array_pop($res_arr) . ($preserve?$enclose:'') . $enc_item . ($preserve?$enclose:''));
+    }
+    else {
+      $exp_del_arr = explode($delim, $enc_item);
+      array_push($res_arr, array_pop($res_arr) . array_shift($exp_del_arr));
+      $res_arr = array_merge($res_arr, $exp_del_arr);
     }
   }
-  return $resArr;
+  return $res_arr;
 }
 
 //copied from apache solr service and added space as a value to escape.  We are using this to escape the field being searched not the text being searched for so we need both.
@@ -88,56 +90,56 @@ function lesser_escape($value) {
 
 //escape characters in field names of facets
 function solr_escape($facets) {
-  $returnFacets = array();
+  $return_facets = array();
   foreach ($facets as $facet) {
     $tmp = substr($facet, 0, strpos($facet, ':"'));
     $tmp = lesser_escape(trim($tmp));
 
-    $returnFacets[] = $tmp . substr($facet,strpos($facet,':"'),strlen($facet));
+    $return_facets[] = $tmp . substr($facet, strpos($facet, ':"'), strlen($facet));
 
   }
-  return $returnFacets;
+  return $return_facets;
 }
 
 function get_search_terms_array($path = NULL, $file = NULL) {
   if (!isset($path)) {
     $path = drupal_get_path('module', 'islandora_solr_search');
   }
-  $xmlDoc = new DomDocument();
+  $xml_doc = new DomDocument();
   if (!isset($file)) {
     $file = 'searchTerms.xml';
   }
-  $xmlDoc->load($path . '/' . $file);
-  $nodeList = $xmlDoc->getElementsByTagName('term');
+  $xml_doc->load($path . '/' . $file);
+  $node_list = $xml_doc->getElementsByTagName('term');
   $types = array();
-  for ($i = 0; $i < $nodeList->length; $i++) {
-    $field = $nodeList->item($i)->getElementsByTagName('field');
-    $value = $nodeList->item($i)->getElementsByTagName('value');
-    $fieldValue = $field->item(0)->nodeValue;
-    $valueValue = $value->item(0)->nodeValue;
-    $types["$fieldValue"] = "$valueValue";
+  for ($i = 0; $i < $node_list->length; $i++) {
+    $field = $node_list->item($i)->getElementsByTagName('field');
+    $value = $node_list->item($i)->getElementsByTagName('value');
+    $field_value = $field->item(0)->nodeValue;
+    $value_value = $value->item(0)->nodeValue;
+    $types["$field_value"] = "$value_value";
   }
   return $types;
 }
 
-function islandora_build_substitution_list($rawFieldList) {
-  $facetArray = array();
-  $facetFields = '';
-  $lines = preg_split('/[,|\n|\r]/', $rawFieldList);
+function islandora_build_substitution_list($raw_field_list) {
+  $facet_array = array();
+  $facet_fields = '';
+  $lines = preg_split('/[,|\n|\r]/', $raw_field_list);
   foreach ($lines as $line) {
-    if( $line ) {
-      $lineArray = explode('~', $line);
-      $key = trim($lineArray[0]);
-      $value = trim($lineArray[1]);
+    if ($line) {
+      $line_array = explode('~', $line);
+      $key = trim($line_array[0]);
+      $value = trim($line_array[1]);
       if (!$value) {
         $value = $key;
       }
-      $facetArray[$key] = $value;
-      if ($facetFields) {
-        $facetFields .= ",";
+      $facet_array[$key] = $value;
+      if ($facet_fields) {
+        $facet_fields .= ",";
       }
-      $facetFields .= $key;
+      $facet_fields .= $key;
     }
   }
-  return $facetArray;
+  return $facet_array;
 }
