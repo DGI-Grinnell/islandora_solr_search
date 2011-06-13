@@ -1,6 +1,7 @@
-<?php
+<?php // $Id$
 
-/*
+/**
+ * @file
  * Contains methods to build and execute a solr query.
  * Depends on Apache_Solr_Php client.
  */
@@ -29,14 +30,14 @@ class IslandoraSolrQueryProcessor {
     module_load_include('inc', 'islandora_solr_search', 'includes/common');
   }
 
-  function buildAndExecuteQuery($query, $fq=null, $dismax=null) {
+  function buildAndExecuteQuery($query, $fq=NULL, $dismax=NULL) {
     $this->buildQuery($query, $fq, $dismax);
     return $this->executeQuery();
   }
 
   //default implementation for solr search.  You can configure others in the block config settings
   // TODO: Get rid of the global $facetArray?  It is the only global yet relied upon.
-  function buildQuery($query, $fq=null, $dismax=null) {
+  function buildQuery($query, $fq=NULL, $dismax=NULL) {
     // Get pager variable
     $startPage = isset($_GET['page']) ? $_GET['page'] : 0;
     $this->solrLimit = variable_get('islandora_solr_search_num_of_results', 20);
@@ -46,14 +47,15 @@ class IslandoraSolrQueryProcessor {
     // Get display profile
     $islandora_solr_primary_display = variable_get( 'islandora_solr_primary_display', 'default' );
     $profiles = module_invoke_all("islandora_solr_primary_display");
-    if( !isset( $profiles[$islandora_solr_primary_display] )) {
-      drupal_set_message("There is an error in the solr search configuration: the display profile is not found.", 'error');
+    if ( !isset( $profiles[$islandora_solr_primary_display] )) {
+    $message = check_plain(t("There is an error in the solr search configuration: the display profile is not found."));
+      drupal_set_message($message, 'error');
       return "";
     }
     $profile = $profiles[$islandora_solr_primary_display];
 
     // Include the file for the display profile
-    require_once(drupal_get_path('module', $profile['module']) .'/'. $profile['file']);
+    require_once(drupal_get_path('module', $profile['module']) . '/' . $profile['file']);
 
     // Set display class and function vars
     $solrClass = $profile['class'];
@@ -72,7 +74,7 @@ class IslandoraSolrQueryProcessor {
     $facetFields = '';
     $rawFacetVals = variable_get("islandora_solr_search_block_facets", 'dc.subject,dc.type');
     $facetArray = islandora_build_substitution_list($rawFacetVals);
-    $facetFields = implode(",",array_keys($facetArray));
+    $facetFields = implode(",", array_keys($facetArray));
 
 
 
@@ -84,17 +86,17 @@ class IslandoraSolrQueryProcessor {
       'facet.mincount' => $facetMinCount,
       'facet.limit' => $facetlimit,
       'qt' => $requestHandler,
-      'facet.field' => explode(',', $facetFields), //comma separated list configured in the block config
+      'facet.field' => explode(',', $facetFields), // comma separated list configured in the block config
     );
 
 
-    $debugQuery = (variable_get('islandora_solr_search_debug_mode', 0) ? "true" : null ); //any val incl. 'false' is treated as true by Solr
+    $debugQuery = (variable_get('islandora_solr_search_debug_mode', 0) ? "true" : NULL ); // any val incl. 'false' is treated as true by Solr
 
     if ($fq != NULL && $fq != '-') {
       $fq = restore_slashes($fq); //put the slash back
-      $fqs = csv_explode(IslandoraSolrQueryProcessor::$facetSeparator,$fq,'"',true);//to filter by more then one facet we will separate them by~ for nowseparate them by~ for now
+      $fqs = csv_explode(IslandoraSolrQueryProcessor::$facetSeparator, $fq, '"', TRUE); // to filter by more then one facet we will separate them by~ for nowseparate them by~ for now
       $this->solrParams['fq'] = $fqs;
-      $islandora_fq = replace_slashes($fq); //remove the slash here as we will be using this in url's
+      $islandora_fq = replace_slashes($fq); // remove the slash here as we will be using this in url's
     }
     if (empty($islandora_fq)) {
       $islandora_fq = '-';
@@ -106,34 +108,34 @@ class IslandoraSolrQueryProcessor {
     $this->solrStart = max(0, $startPage) * $this->solrLimit;
 
     // The breadcrumb should go in the display class
-    $queryurl = "islandora/solr/search/".replace_slashes($this->solrQuery);
+    $queryurl = "islandora/solr/search/" . replace_slashes($this->solrQuery);
     $breadcrumb_fq = $islandora_fq;
-    if (strcmp($islandora_fq,"-")) {
-      foreach( csv_explode(IslandoraSolrQueryProcessor::$facetSeparator,$islandora_fq,'"',true) as $facet ) {
-        $field = substr($facet,0,strpos($facet,":"));
-        $value = restore_slashes(trim(substr($facet,strpos($facet,":")+1),'"'));
-        $options = array('html'=>true);
+    if (strcmp($islandora_fq, "-")) {
+      foreach ( csv_explode(IslandoraSolrQueryProcessor::$facetSeparator, $islandora_fq, '"', TRUE) as $facet ) {
+        $field = substr($facet, 0, strpos($facet, ":"));
+        $value = restore_slashes(trim(substr($facet, strpos($facet, ":")+1), '"'));
+        $options = array('html' => TRUE);
         $options['attributes']['title'] = $facet;
-        $crumblink = $queryurl . "/" . $breadcrumb_fq . (empty($this->solrDefType) ? '' : '/'.$this->solrDefType);
-        $cut_fq = $this->delete_filter($islandora_fq,$facet);
-        $cutlink = $queryurl . "/" . $cut_fq . (empty($this->solrDefType) ? '' : '/'.$this->solrDefType);
-        if( !strncmp( "-", $facet, 1 )) {
+        $crumblink = $queryurl . "/" . $breadcrumb_fq . (empty($this->solrDefType) ? '' : '/' . $this->solrDefType);
+        $cut_fq = $this->delete_filter($islandora_fq, $facet);
+        $cutlink = $queryurl . "/" . $cut_fq . (empty($this->solrDefType) ? '' : '/' . $this->solrDefType);
+        if ( !strncmp( "-", $facet, 1 )) {
           $options['attributes']['class'] = "strikethrough";
         }
-        $breadcrumb[] = l($value,$crumblink,$options) .
-                        " <span class='islandora_solr_search_breadcrumb_super'>(".l("x",$cutlink,array('attributes'=>array('title'=>"Remove ".$facet))).")</span>";
-        $breadcrumb_fq = $this->delete_filter($breadcrumb_fq,$facet);
+        $breadcrumb[] = l($value, $crumblink, $options) .
+                        " <span class='islandora_solr_search_breadcrumb_super'>(" . l(t("x"), $cutlink, array('attributes' => array('title' => "Remove " . $facet))) . ")</span>";
+        $breadcrumb_fq = $this->delete_filter($breadcrumb_fq, $facet);
       }
     }
-    if( !empty( $this->solrQuery ) && strcmp( $this->solrQuery, ' ' )) {
+    if ( !empty( $this->solrQuery ) && strcmp( $this->solrQuery, ' ' )) {
     $facet = '';
       $cutlink = "islandora/solr/search/ /" . $islandora_fq . "/dismax";
-      $queryval = trim(substr($this->solrQuery,strpos($this->solrQuery,":")+1),")(");
-      $breadcrumb[] = l($queryval,$queryurl."/-",array('attributes'=>array('title'=>$this->solrQuery))) . 
-                      " <span class='islandora_solr_search_breadcrumb_super'>(".l("x",$cutlink,array('attributes'=>array('title'=>"Remove ".$facet))).")</span>";
+      $queryval = trim(substr($this->solrQuery, strpos($this->solrQuery, ":")+1), ")(");
+      $breadcrumb[] = l($queryval, $queryurl . "/-", array('attributes' => array('title' => $this->solrQuery))) . 
+                      " <span class='islandora_solr_search_breadcrumb_super'>(" . l(t("x"), $cutlink, array('attributes' => array('title' => "Remove " . $facet))) . ")</span>";
     }
-    $breadcrumb[] = l(t('Home'),NULL);
-    if( !empty( $breadcrumb )) $breadcrumb = array_reverse($breadcrumb);
+    $breadcrumb[] = l(t('Home'), NULL);
+    if ( !empty( $breadcrumb )) $breadcrumb = array_reverse($breadcrumb);
     drupal_set_breadcrumb($breadcrumb);
 
     $this->solrFilters = $islandora_fq;
@@ -167,7 +169,8 @@ class IslandoraSolrQueryProcessor {
     try {
       $results = $solr->search($this->solrQuery, $this->solrStart, $this->solrLimit, $this->solrParams);
     } catch (Exception $e) {
-      drupal_set_message(t('error searching ') . $e->getMessage());
+      $message = check_plain(t('error searching') . ' ' . $e->getMessage());
+      drupal_set_message($message);
     }
     $this->solrResult = $results;
     if (empty($results)) {
@@ -191,10 +194,10 @@ class IslandoraSolrQueryProcessor {
    * @param <string> $facets
    * @param <string> $facet
    */
-  function delete_filter($filters,$filter) {
-    $filters = str_replace($filter,"",$filters);
-    $filters = str_replace("~~","~",$filters);
-    $filters = trim($filters,"~");
+  function delete_filter($filters, $filter) {
+    $filters = str_replace($filter, "", $filters);
+    $filters = str_replace("~~", "~", $filters);
+    $filters = trim($filters, "~");
     return $filters;
   }
 
