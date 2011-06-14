@@ -254,11 +254,13 @@ function theme_islandora_solr_search_block_form($form) {
   $resultsClass = new IslandoraSolrResults();
   
   $form = $form['form']; // in D7 the form array is nested in another array.
-  //dsm($form);
+
   return $resultsClass->theme_solr_search_form($form);
 }
 
 function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
+  $query = urldecode($query); // in D7 I have to decode the parameter manually, not sure why.
+  
   global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
@@ -331,7 +333,7 @@ function islandora_solr_search_block_form_submit($form, &$form_state) {
   global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
 
-  $type_id = trim($form_state['values']['type']);
+  // $type_id = trim($form_state['values']['type']); // $form_state['values']['type'] is not set nor in D6, nor D7. It throws an error only in D7. Uncomment, because I don't really see what is being done with it. 
   $repeat = variable_get('islandora_solr_search_block_repeat', '3');
   $fedora_terms = array();
   $types = array();
@@ -343,13 +345,26 @@ function islandora_solr_search_block_form_submit($form, &$form_state) {
       $fedora_terms[] = lesser_escape(trim($form_state['values']["fedora_terms$fieldNum"]));
     }
     $next = $fieldNum + 1;
-    if ($form_state['values']["fedora_terms$next"] && $form_state['values']["fedora_terms$fieldNum"]) {
-      $booleans[] = trim($form_state['values']["andor$fieldNum"]);
+    if (isset($form_state['values']["fedora_terms$next"]) && isset($form_state['values']["fedora_terms$fieldNum"])) {
+      if ($form_state['values']["fedora_terms$next"] && $form_state['values']["fedora_terms$fieldNum"]) {
+        $booleans[] = trim($form_state['values']["andor$fieldNum"]);
+      }
     }
   }
-
+ 
+  //set variable
+  $searchString = '';
   for ($iteration = 0; $iteration < count($fedora_terms); $iteration++) {
-    $searchString .= $types[$iteration] . ":" . $fedora_terms[$iteration] . " " . $booleans[$iteration] . " ";
+  
+    if(isset($booleans[$iteration])) {
+      $bool = $booleans[$iteration];
+    }
+    else {
+      $bool = '';
+    }
+      
+    $searchString .= $types[$iteration] . ":" . $fedora_terms[$iteration] . " " . $bool . " ";
+  
   }
   $searchString = trim($searchString);
   $searchString = htmlspecialchars(drupal_encode_path($searchString), ENT_QUOTES, 'utf-8', FALSE); // D6: drupal_urlencode D7: drupal_encode_path
