@@ -259,7 +259,7 @@ function theme_islandora_solr_search_block_form($form) {
 }
 
 function islandora_solr_search($query, $fq=NULL, $dismax=NULL) {
-  $query = urldecode($query); // in D7 I have to decode the parameter manually, not sure why.
+  $query = urldecode($query); // in D7 I have to decode the parameter manually, because drupal_goto calls url(), which in D7 encodes parameters.
   
   global $_islandora_solr_search_queryclass;
   islandora_solr_search_init();
