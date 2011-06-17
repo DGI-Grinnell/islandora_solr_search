@@ -1,5 +1,3 @@
-; $Id$ 
-
 name = Islandora Solr Sample Configuration
 description = Example Code for Implementation of Islandora Solr Search Configuration providing Table output.
 dependencies[] = islandora_solr_search
