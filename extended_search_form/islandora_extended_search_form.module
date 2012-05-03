@@ -167,8 +167,8 @@ EOT
  */
 function islandora_extended_search_form_submit(array $form, array &$form_state) {
   $_SESSION['islandora_extended_search']['values'] = $form_state['values'];
-  //$_SESSION['islandora_extended_search']['sort'] = $form_state['values']['sort'];
-  //$_SESSION['islandora_extended_search']['order'] = $form_state['values']['order'];
+  $_SESSION['islandora_extended_search']['sort'] = $form_state['values']['sort'];
+  $_SESSION['islandora_extended_search']['order'] = $form_state['values']['order'];
   $query = _islandora_extended_search_form_build_query($form_state);
   $form_state['redirect'] = 'islandora/solr/search/' . urlencode($query) . '/'; // Redirect to the search.
 }
@@ -187,6 +187,7 @@ function _islandora_extended_search_form_build_query(array &$form_state) {
     }
   }
   $query = !empty($statements) ? implode(' AND ', $statements) : '*:*'; // Empty return all results. 
+  $query .= ' '. $form_state['values']['sort'] .' '. $form_state['values']['order'];
   return $query;
 }
 
