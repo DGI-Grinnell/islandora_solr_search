@@ -231,7 +231,8 @@ class IslandoraSolrQueryProcessor {
     // At this point let's invoke a hook for third-party modules to mess about
     // with the query parameters if they need to.  Third party modules may alter
     // this object's query parameters if they wish.
-    module_invoke_all('islandora_solr_search_query_processor', $this); //The hook implementation needs to specify that it takes a reference, not be passed one
+    $altered_params = module_invoke_all('islandora_solr_search_query_processor');
+    $processor->solrParams = array_merge_recursive($processor->solrParams,$altered_params);
     $processor->solrParams['fq'][] = $fq;
     return;
   }
