@@ -233,7 +233,7 @@ class IslandoraSolrQueryProcessor {
     // this object's query parameters if they wish.
     $altered_params = module_invoke_all('islandora_solr_search_query_processor');
     $this->solrParams = array_merge_recursive($this->solrParams,$altered_params);
-    $this->solrParams['fq'][] = $fq;
+    //  $this->solrParams['fq'][] = $fq;
     return;
   }
 
