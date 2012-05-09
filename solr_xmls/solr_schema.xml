@@ -494,12 +494,12 @@
             multiValued="true"/>
         <copyField source="mods.copyrightDate" dest="mods.copyrightDate_s" />
         
-        <field name="mods.dateCreated" type="text" indexed="true" stored="false" multiValued="true"/>
+        <!-- single-valued -->
+        <field name="mods.dateCreated" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateCreated_s" type="string" indexed="true" stored="true" 
-            multiValued="true"/>
+            multiValued="false"/>
         <copyField source="mods.dateCreated" dest="mods.dateCreated_s" />
         
-        <!-- single-valued -->
         <field name="mods.dateValid" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateValid_s" type="string" indexed="true" stored="true" multiValued="false"/>
         <copyField source="mods.dateValid" dest="mods.dateValid_s" />
