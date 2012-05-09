@@ -196,7 +196,7 @@
             <xsl:attribute name="name">
                 <xsl:value-of select="concat('mods.', 'indexTitle')"/>
             </xsl:attribute>
-            <xsl:value-of select="//mods:title"/>
+            <xsl:value-of select="//mods:titleInfo[not(@type)]/mods:title[1]"/>
         </field>
 
         <xsl:variable name="pageCModel">
