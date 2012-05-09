@@ -318,20 +318,73 @@
         <field name="dc.creator" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="dc.creator_s" type="string" maxChars="300" indexed="true" stored="true"
             multiValued="true"/>
-        <copyField source="dc:contributor" dest="dc.contributor_s" />
-        <field name="dc:contributor" type="text" indexed="true" stored="false" multiValued="true"/>
+        <copyField source="dc.contributor" dest="dc.contributor_s" />
+        <field name="dc.contributor" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="dc.contributor_s" type="string" maxChars="300" indexed="true" stored="true"
             multiValued="true"/>
         <copyField source="dc.date" dest="dc.date_s" />
         <field name="dc.date" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="dc.date_s" type="string" maxChars="300" indexed="true" stored="true"
             multiValued="true"/>
-        <copyField source="dc:source" dest="dc.source_s" />
-        <field name="dc:source" type="text" indexed="true" stored="false" multiValued="true"/>
+        <copyField source="dc.source" dest="dc.source_s" />
+        <field name="dc.source" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="dc.source_s" type="string" maxChars="300" indexed="true" stored="true"
             multiValued="true"/>
         
         <field name="dc.description" type="text" indexed="true" stored="false" multiValued="true"/>
+	<copyField source="dc.description" dest="text"></copyField>        
+        <!-- Grinnell specialised section -->
+        <!-- First of all, copy 72(!!) fields to 'text' -->
+        <!-- 12 contributor fields -->
+        <copyField source="dc.contributor*" dest="text"></copyField>
+        <!-- 19 relation fields - up to 31 -->
+        <copyField source="dc.relation" dest="text"></copyField>
+        <!-- 5 coverage fields - up to 36 -->
+        <copyField source="dc.coverage.*" dest="text"></copyField>
+        <!-- 10 subject fields - up to 46 -->
+        <copyField source="dc.subject.*" dest="text"></copyField>
+        <!-- 13 identifier fields - up to 59 -->
+        <copyField source="dc.identifier.*" dest="text"></copyField>
+        <copyField source="dc.identifier.nih" dest="dc.identifier.grant"></copyField>
+        <!-- Miscellaneous fields (13 at present - up to 72) -->
+        <copyField source="dc.date.created" dest="text"></copyField>
+        <copyField source="dc.date.available" dest="text"></copyField>
+        <copyField source="dc.date.copyright" dest="text"></copyField>
+        <copyField source="dc.date.submitted" dest="text"></copyField>
+        
+        <copyField source="dc.type" dest="text"></copyField>
+        <copyField source="dc.language" dest="text"></copyField>
+        <copyField source="dc.publisher" dest="text"></copyField>
+        
+        <copyField source="dc.title" dest="text"></copyField>
+        <copyField source="dc.title.alternative" dest="text"></copyField>
+        
+        <copyField source="dc.description.sponsorship" dest="text"></copyField>
+        <copyField source="dc.description.affiliation" dest="text"></copyField>
+        <copyField source="dc.description.uri" dest="text"></copyField>
+        <copyField source="dc.description.tableofcontents" dest="text"></copyField>
+        
+        <!-- Make extra fields available for faceting. They must be string types so they don't get broken up. -->
+        <!-- dc.contributor (catch-all) - already done (see above) -->
+        <!-- dc.type - - already done (see above) -->
+        <!-- dc.language -->
+        <copyField source="dc.language" dest="dc.language_s"></copyField>
+        <!-- dc.coverage.spatial -->
+        <copyField source="dc.coverage.spatial" dest="dc.coverage_spatial_s"></copyField>
+        <!-- dc.coverage.temporal -->
+        <copyField source="dc.coverage.temporal" dest="dc.coverage_temporal_s"></copyField>
+        <!-- dc.date fields (separately) -->
+        <copyField source="dc.date.created" dest="dc.date.created_date"></copyField>
+        <copyField source="dc.date.available" dest="dc.date.available_date"></copyField>
+        <copyField source="dc.date.copyright" dest="dc.date.copyright_date"></copyField>
+        <copyField source="dc.date.submitted" dest="dc.date.submitted_date"></copyField>
+        <!-- dc.subject (separately) -->
+        <copyField source="dc.subject.lcsh" dest="dc.subject_lcsh_s"></copyField>
+        <copyField source="dc.subject.topic" dest="dc.subject_topic_s"></copyField>
+        <copyField source="dc.subject.place" dest="dc.subject_place_s"></copyField>
+        <copyField source="dc.subject.chronological" dest="dc.subject_chronological_s"></copyField>
+        <copyField source="dc.subject.lcc" dest="dc.subject_lcc_s"></copyField>
+        <copyField source="dc.subject.ddc" dest="dc.subject_ddc_i"></copyField>
         
         <copyField source="mods.title" dest="mods.title_s" />
         <field name="mods.title" type="text" indexed="true" stored="false" multiValued="true"/>
@@ -404,9 +457,7 @@
         <field name="mods.sor" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="mods.sor_s" type="string" maxChars="300" indexed="true" stored="true" 
             multiValued="true"/>
-        <copyField source="mods.dateIssued" dest="mods.dateIssued_s" />
-        <field name="mods.dateIssued" type="text" indexed="true" stored="false" multiValued="true"/>
-        <field name="mods.dateIssued_s" type="string" indexed="true" stored="true" multiValued="true"/>
+        
         <copyField source="mods.placeOfPublication" dest="mods.placeOfPublication_s" />
         <field name="mods.placeOfPublication" type="text" indexed="true" stored="false"
             multiValued="true"/>
@@ -432,14 +483,48 @@
         <field name="mods.note" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="mods.note_s" type="string" indexed="true" stored="true" 
             multiValued="true"/>
-        <copyField source="mods.provice" dest="mods.province_s" />
+        <copyField source="mods.province" dest="mods.province_s" />
         <field name="mods.province" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="mods.province_s" type="string" indexed="true" stored="true" 
             multiValued="true"/>
-        <copyField source="mods.dateCreated" dest="mods.dateCreated_s" />
+        
+        <!-- Individual date fields -->
+        <field name="mods.copyrightDate" type="text" indexed="true" stored="false" multiValued="true"/>
+        <field name="mods.copyrightDate_s" type="string" indexed="true" stored="true" 
+            multiValued="true"/>
+        <copyField source="mods.copyrightDate" dest="mods.copyrightDate_s" />
+        
         <field name="mods.dateCreated" type="text" indexed="true" stored="false" multiValued="true"/>
         <field name="mods.dateCreated_s" type="string" indexed="true" stored="true" 
             multiValued="true"/>
+        <copyField source="mods.dateCreated" dest="mods.dateCreated_s" />
+        
+        <!-- single-valued -->
+        <field name="mods.dateValid" type="text" indexed="true" stored="false" multiValued="false"/>
+        <field name="mods.dateValid_s" type="string" indexed="true" stored="true" multiValued="false"/>
+        <copyField source="mods.dateValid" dest="mods.dateValid_s" />
+        
+        <field name="mods.dateIssued" type="text" indexed="true" stored="false" multiValued="false"/>
+        <field name="mods.dateIssued_s" type="string" indexed="true" stored="true" multiValued="false"/>
+        <copyField source="mods.dateIssued" dest="mods.dateIssued_s" />
+        
+        <field name="mods.dateSubmitted" type="text" indexed="true" stored="false" multiValued="false"/>
+        <field name="mods.dateSubmitted_s" type="string" indexed="true" stored="true" 
+            multiValued="false"/>
+        <copyField source="mods.dateSubmitted" dest="mods.dateSubmitted_s" />
+        
+        <field name="mods.dateCaptured" type="text" indexed="true" stored="false" multiValued="false"/>
+        <field name="mods.dateCaptured_s" type="string" indexed="true" stored="true" 
+            multiValued="false"/>
+        <copyField source="mods.dateCaptured" dest="mods.dateCaptured_s" />
+        
+        <field name="mods.dateAvailable" type="text" indexed="true" stored="false" multiValued="false"/>
+        <field name="mods.dateAvailable_s" type="string" indexed="true" stored="true" 
+            multiValued="false"/>
+        <copyField source="mods.dateAvailable" dest="mods.dateAvailable_s" />
+        
+        <!-- end date fields -->
+        
         <copyField source="mods.physicalLocation" dest="mods.physicalLocation_s" />
         <field name="mods.physicalLocation" type="text" indexed="true" stored="false"
             multiValued="true"/>
@@ -473,10 +558,21 @@
         <field name="department" type="string" maxChars="300" indexed="true" stored="true"
             multiValued="true"/>
        
-       
-
-
-
+       <!-- EAC-CPF fields -->
+        <field name="eac.entityType" type="string" stored="true" indexed="true" multiValued="false" />
+        
+        <dynamicField name="eac.namePart.*" stored="true" indexed="true" multiValued="false" type="text" />
+        
+        <field name="eac.entityId" type="string" indexed="true" stored="true" multiValued="true" />
+        
+        <field name="eac.existDates" type="text" indexed="true" stored="true" multiValued="false" />
+        <field name="eac.existDates.fromDate" type="sint" indexed="true" stored="true" multiValued="false" />
+        <field name="eac.existDates.toDate" type="sint" indexed="true" stored="true" multiValued="false" />
+        
+        <field name="eac.classYear" type="sint" indexed="true" stored="true" multiValued="false" />
+        <field name="eac.position" type="text" indexed="true" stored="true" multiValued="true" />
+        <field name="eac.biography" type="text" indexed="true" stored="true" multiValued="false" />
+        
         <!-- uncomment the following to ignore any fields that don't already match an existing 
         field name or dynamic field, rather than reporting them as an error. 
         alternately, change the type="ignored" to some other type e.g. "text" if you want 
@@ -491,11 +587,12 @@
      Longer patterns will be matched first.  if equal size patterns
      both match, the first appearing in the schema will be used.  -->
 
-
+        <dynamicField name="*_date" type="date" indexed="true" stored="true" multiValued="true"/>
+        <dynamicField name="*_s" type="string" indexed="true" stored="true" multiValued="true"/>
 
         <dynamicField name="dc*" type="text" indexed="true" stored="true" multiValued="true"/>
         <dynamicField name="mods*" type="text" indexed="true" stored="true" multiValued="true"/>
-
+        <dynamicField name="eac*" type="text" indexed="true" stored="true" multiValued="true"/>
 
         <dynamicField name="*" type="text" indexed="true" stored="true" multiValued="true"/>
         <!-- catch all for fields such as fgs.state etc.-->
@@ -508,7 +605,7 @@
     <uniqueKey>PID</uniqueKey>
 
     <!-- field for the QueryParser to use when an explicit fieldname is absent -->
-    <defaultSearchField>dc.description</defaultSearchField>
+    <defaultSearchField>text</defaultSearchField>
 
     <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
     <solrQueryParser defaultOperator="OR"/>
