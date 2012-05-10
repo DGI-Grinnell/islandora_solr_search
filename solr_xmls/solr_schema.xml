@@ -560,6 +560,9 @@
        
        <!-- EAC-CPF fields -->
         <field name="eac.entityType" type="string" stored="true" indexed="true" multiValued="false" />
+        <field name="eac.nameEntry.primary" type="text" stored="false" indexed="true" multiValued="false"/>
+        <field name="eac.nameEntry.primary_s" type="string" stored="true" indexed="true" multiValued="false"/>
+        <copyField source="eac.nameEntry.primary" dest="eac.nameEntry.primary_s" />
         
         <dynamicField name="eac.namePart.*" stored="true" indexed="true" multiValued="false" type="text" />
         

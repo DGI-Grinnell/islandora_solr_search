@@ -971,6 +971,7 @@
         <!-- done -->
         <xsl:apply-templates select="eac:entityType"/>
         <!-- done -->
+        <xsl:apply-templates select="eac:nameEntry[@localType='primary']" />
         <xsl:apply-templates select="eac:nameEntry[not(@localType='primary')]"/>
         <!-- done -->
         <xsl:apply-templates select="eac:entityId"/>
@@ -981,7 +982,15 @@
             <xsl:value-of select="normalize-space()"/>
         </field>
     </xsl:template>
-    <xsl:template match="eac:nameEntry">
+    <xsl:template match="eac:nameEntry[@localType='primary']">
+        <field>
+            <xsl:attribute name="name">
+                <xsl:value-of select="concat('eac.nameEntry.','primary')"/>
+            </xsl:attribute>
+            <xsl:value-of select="normalize-space(eac:part)"/>   
+        </field>
+    </xsl:template>
+    <xsl:template match="eac:nameEntry[not(@localType='primary')]">
         <xsl:variable name="first" select="eac:part[@localType='firstName']"/>
         <xsl:variable name="middle" select="eac:part[@localType='middleName']"/>
         <field name="eac.namePart.given">
