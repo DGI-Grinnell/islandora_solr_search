@@ -832,7 +832,7 @@
             </xsl:if>
         </xsl:for-each>
 
-        <xsl:for-each select="//mods:originInfo/mods:dateCreated">
+        <xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:dateCreated">
             <xsl:if test="text() [normalize-space(.) ]">
                 <!--don't bother with empty space-->
                 <field>
