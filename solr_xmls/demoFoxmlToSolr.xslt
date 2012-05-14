@@ -529,7 +529,7 @@
 
         </xsl:for-each>
 
-<!--
+        <!--
         <xsl:for-each select="$MODS_STREAM//mods:topic">
             <xsl:if test="text() [normalize-space(.) ]">
                 <field>
@@ -578,73 +578,75 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <!-- specialised subjects -->
         <xsl:for-each select="$MODS_STREAM//mods:subject[@authority='lcsh']">
             <xsl:if test="normalize-space(mods:topic)">
-              <field>
-                <xsl:attribute name="name">
-                  <xsl:value-of select="concat('mods.subject','.lcsh.topic')" />
-                </xsl:attribute>
-                <xsl:value-of select="normalize-space(mods:topic)" />
-              </field>
+                <field>
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('mods.subject','.lcsh.topic')"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(mods:topic)"/>
+                </field>
             </xsl:if>
         </xsl:for-each>
 
         <xsl:for-each select="$MODS_STREAM//mods:subject[not(@authority)]/mods:topic">
             <xsl:if test="text() [normalize-space(.)]">
-              <field>
-                <xsl:attribute name="name">
-                  <xsl:value-of select="concat('mods.subject','.topic')" />
-                </xsl:attribute>
-                <xsl:value-of select="normalize-space(text())" />
-              </field>
+                <field>
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('mods.subject','.topic')"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(text())"/>
+                </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:subject/mods:geographic">
-          <xsl:if test="text() [normalize-space(.)]">
-            <field>
-              <xsl:attribute name="name">
-                <xsl:value-of select="concat('mods.subject','.geographic')" />
-              </xsl:attribute>
-              <xsl:value-of select="normalize-space(text())" />
-            </field>
-          </xsl:if>
+            <xsl:if test="text() [normalize-space(.)]">
+                <field>
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('mods.subject','.geographic')"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(text())"/>
+                </field>
+            </xsl:if>
         </xsl:for-each>
 
         <xsl:for-each select="$MODS_STREAM//mods:subject/mods:temporal">
-          <xsl:if test="text() [normalize-space(.)]">
-            <field>
-              <xsl:choose>
-                <xsl:when test="@point">
-                  <xsl:value-of select="concat('mods.subject','.temporal.',@point)" />
-                </xsl:when>
-                <xsl:otherwise>
-                  <xsl:value-of select="concat('mods.subject','.temporal')" />
-                </xsl:otherwise>
-              </xsl:choose>
-            </field>
-            <xsl:value-of select="normalize-space(text())" />
-          </xsl:if>
+            <xsl:if test="text() [normalize-space(.)]">
+                <field>
+                    <xsl:attribute name="name">
+                        <xsl:choose>
+                            <xsl:when test="@point">
+                                <xsl:value-of select="concat('mods.subject','.temporal.',@point)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat('mods.subject','.temporal')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(text())"/>
+                </field>
+            </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:subject/mods:cartographics">
-          <xsl:if test="normalize-space(mods:coordinates)">
-            <field name="mods.subject.cartographics.coordinates">
-              <xsl:attribute name="name">
-                <xsl:value-of select="concat('mods.subject','cartographics.coordinates')" />
-              </xsl:attribute>
-              <xsl:value-of select="normalize-space(mods:coordinates)" />
-            </field>
-          </xsl:if>
+            <xsl:if test="normalize-space(mods:coordinates)">
+                <field name="mods.subject.cartographics.coordinates">
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('mods.subject','cartographics.coordinates')"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(mods:coordinates)"/>
+                </field>
+            </xsl:if>
         </xsl:for-each>
 
         <!-- end specialised subjects -->
-
+        <!-- don't need this - it comes under 'physicalDescription' -->
+        <!-- 
         <xsl:for-each select="$MODS_STREAM//mods:extent">
             <xsl:if test="text() [normalize-space(.) ]">
-                <!--don't bother with empty space-->
                 <field>
                     <xsl:attribute name="name">
                         <xsl:value-of select="concat('mods.', 'extent')"/>
@@ -653,6 +655,7 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
+        -->
 
         <xsl:for-each select="$MODS_STREAM//mods:accessCondition">
             <xsl:if test="text() [normalize-space(.) ]">
@@ -756,7 +759,6 @@
                     <xsl:value-of select="normalize-space(text())"/>
                 </field>
             </xsl:if>
-
         </xsl:for-each>
 
         <xsl:for-each select="$MODS_STREAM//mods:originInfo//mods:placeTerm[@type='text']">
@@ -807,7 +809,7 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:copyrightDate">
             <xsl:if test="text() [normalize-space(.) ]">
                 <!--don't bother with empty space-->
@@ -843,7 +845,7 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:dateCaptured">
             <xsl:if test="text() [normalize-space(.) ]">
                 <!--don't bother with empty space-->
@@ -855,7 +857,7 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:dateSubmitted">
             <xsl:if test="text() [normalize-space(.) ]">
                 <!--don't bother with empty space-->
@@ -867,11 +869,13 @@
                 </field>
             </xsl:if>
         </xsl:for-each>
-        
+
         <xsl:for-each select="$MODS_STREAM//mods:originInfo/mods:dateOther">
             <xsl:if test="text() [normalize-space(.) ]">
                 <xsl:variable name="capitalizedType">
-                    <xsl:value-of select="concat(translate(substring(@type, 1, 1), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), substring(@type, 2))"/>
+                    <xsl:value-of
+                        select="concat(translate(substring(@type, 1, 1), 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'), substring(@type, 2))"
+                    />
                 </xsl:variable>
                 <!--don't bother with empty space-->
                 <field>
@@ -931,14 +935,14 @@
         </xsl:for-each>
 
         <xsl:for-each select="$MODS_STREAM//mods:classification[@authority]">
-          <xsl:if test="text() [normalize-space(.) ]">
-            <field>
-              <xsl:attribute name="name">
-                <xsl:value-of select="concat('mods.classification.',@authority)" />
-              </xsl:attribute>
-              <xsl:value-of select="normalize-space(text())" />
-            </field>
-          </xsl:if>
+            <xsl:if test="text() [normalize-space(.) ]">
+                <field>
+                    <xsl:attribute name="name">
+                        <xsl:value-of select="concat('mods.classification.',@authority)"/>
+                    </xsl:attribute>
+                    <xsl:value-of select="normalize-space(text())"/>
+                </field>
+            </xsl:if>
         </xsl:for-each>
 
         <!--  added for newspaper collection  -->
@@ -971,7 +975,7 @@
         <!-- done -->
         <xsl:apply-templates select="eac:entityType"/>
         <!-- done -->
-        <xsl:apply-templates select="eac:nameEntry[@localType='primary']" />
+        <xsl:apply-templates select="eac:nameEntry[@localType='primary']"/>
         <xsl:apply-templates select="eac:nameEntry[not(@localType='primary')]"/>
         <!-- done -->
         <xsl:apply-templates select="eac:entityId"/>
@@ -987,7 +991,7 @@
             <xsl:attribute name="name">
                 <xsl:value-of select="concat('eac.nameEntry.','primary')"/>
             </xsl:attribute>
-            <xsl:value-of select="normalize-space(eac:part)"/>   
+            <xsl:value-of select="normalize-space(eac:part)"/>
         </field>
     </xsl:template>
     <xsl:template match="eac:nameEntry[not(@localType='primary')]">
@@ -1033,12 +1037,12 @@
         </xsl:if>
         <xsl:if test="eac:dateRange/eac:fromDate[normalize-space()]">
             <field name="eac.existDates.fromDate">
-                <xsl:apply-templates select="eac:dateRange/eac:fromDate" />
+                <xsl:apply-templates select="eac:dateRange/eac:fromDate"/>
             </field>
         </xsl:if>
         <xsl:if test="eac:dateRange/eac:toDate[normalize-space()]">
             <field name="eac.existDates.toDate">
-                <xsl:apply-templates select="eac:dateRange/eac:toDate" />
+                <xsl:apply-templates select="eac:dateRange/eac:toDate"/>
             </field>
         </xsl:if>
     </xsl:template>
