@@ -492,18 +492,25 @@
 
         </xsl:for-each>
         <xsl:for-each select="$MODS_STREAM//mods:roleTerm">
-            <xsl:if test="text() [normalize-space(../../mods:namePart) ]">
+            <xsl:if test="normalize-space(../../mods:namePart)">
                 <!--don't bother with empty space-->
                 <field>
-                    <xsl:attribute name="name">
-                        <xsl:value-of select="concat('mods.', text())"/>
-                    </xsl:attribute>
-                    <xsl:value-of select="../../mods:namePart/text()"/>
+                <xsl:attribute name="name">
+                    <xsl:value-of select="concat('mods.', text())"/>
+                </xsl:attribute>
+                <xsl:choose>
+                    <xsl:when test="../../mods:namePart[not(@type) and normalize-space()]">
+                        <xsl:value-of select="normalize-space(../../mods:namePart)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:variable name="firstName" select="normalize-space(../../mods:namePart[@type='given'])" />
+                        <xsl:variable name="lastName" select="normalize-space(../../mods:namePart[@type='family'])" />
+                        <xsl:value-of select="concat($lastName, ', ', $firstName)"/>    
+                    </xsl:otherwise>
+                </xsl:choose>
                 </field>
             </xsl:if>
-
         </xsl:for-each>
-
         <xsl:for-each select="$MODS_STREAM//mods:note[@type='statement of responsibility']">
             <xsl:if test="text() [normalize-space(.) ]">
                 <!--don't bother with empty space-->
