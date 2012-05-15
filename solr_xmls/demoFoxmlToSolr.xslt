@@ -426,7 +426,7 @@
             select="//foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]"/>
         <!-- select="islandora-exts:getXMLDatastreamASNodeList($PID, $REPOSITORYNAME, 'MODS', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)" -->
 
-        <xsl:for-each select="$MODS_STREAM//mods:titleInfo[not(@type)]/mods:title">
+        <xsl:for-each select="$MODS_STREAM//mods:mods/mods:titleInfo[not(@type)]/mods:title">
           <field>
             <xsl:attribute name="name">
               <xsl:value-of select="concat('mods.','indexTitle')" />
