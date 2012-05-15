@@ -192,12 +192,14 @@
 
         <!-- field added for indexing only  -->
 
+        <!--
         <field>
             <xsl:attribute name="name">
                 <xsl:value-of select="concat('mods.', 'indexTitle')"/>
             </xsl:attribute>
             <xsl:value-of select="//mods:titleInfo[not(@type)]/mods:title[1]"/>
         </field>
+        -->
 
         <xsl:variable name="pageCModel">
             <xsl:text>info:fedora/ilives:pageCModel</xsl:text>
@@ -423,6 +425,16 @@
         <xsl:variable name="MODS_STREAM"
             select="//foxml:datastream[@ID='MODS']/foxml:datastreamVersion[last()]"/>
         <!-- select="islandora-exts:getXMLDatastreamASNodeList($PID, $REPOSITORYNAME, 'MODS', $FEDORASOAP, $FEDORAUSER, $FEDORAPASS, $TRUSTSTOREPATH, $TRUSTSTOREPASS)" -->
+
+        <xsl:for-each select="$MODS_STREAM//mods:titleInfo[not(@type)]/mods:title">
+          <field>
+            <xsl:attribute name="name">
+              <xsl:value-of select="concat('mods.','indexTitle')" />
+            </xsl:attribute>
+            <xsl:value-of select="normalize-space()" />
+          </field>
+        </xsl:for-each>
+
 
         <!--***********************************************************MODS modified for maps**********************************************************************************-->
         <xsl:for-each select="$MODS_STREAM//mods:title">
