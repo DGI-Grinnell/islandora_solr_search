@@ -232,6 +232,24 @@
             </analyzer>
         </fieldType>
 
+        <fieldType name="titleSortSpaces" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+          <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+          </analyzer>
+        </fieldType>
+        
+        <fieldType name="titleSortSpacesNoArticles" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+          <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+            <filter class="solr.PatternReplaceFilterFactory" pattern="^the\s" replacement="" replace="first" />
+            <filter class="solr.PatternReplaceFilterFactory" pattern="^a\s" replacement="" replace="first" />
+          </analyzer>
+        </fieldType>
+
         <fieldType name="lowercaseUntokenized" class="solr.TextField" sortMissingLast="true"
             omitNorms="true">
             <analyzer>
@@ -383,6 +401,11 @@
         <copyField source="dc.subject.topic" dest="dc.subject_topic_s"></copyField>
         <copyField source="dc.subject.place" dest="dc.subject_place_s"></copyField>
         <copyField source="dc.subject.chronological" dest="dc.subject_chronological_s"></copyField>
+        
+        <!-- merged 'Coverage' field for place, chronological -->
+        <copyField source="dc.subject.place" dest="dc.coverage_s"></copyField>
+        <copyField source="dc.subject.chronological" dest="dc.coverage_s"></copyField>
+        
         <copyField source="dc.subject.lcc" dest="dc.subject_lcc_s"></copyField>
         <copyField source="dc.subject.ddc" dest="dc.subject_ddc_i"></copyField>
         
@@ -547,7 +570,7 @@
         <!-- Not sure what to do with these fields -->
         
         <field name="mods.pageNum" type="integer" indexed="true" stored="true" multiValued="true"/>
-        <field name="mods.indexTitle" type="alphaOnlySort" indexed="true" stored="true"
+        <field name="mods.indexTitle" type="titleSortSpacesNoArticles" indexed="true" stored="true"
             multiValued="false"/>     
 
         <field name="yearPublished" type="text" indexed="true" stored="true" multiValued="true"/>
