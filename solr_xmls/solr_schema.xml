@@ -249,6 +249,15 @@
             <filter class="solr.PatternReplaceFilterFactory" pattern="^a\s" replacement="" replace="first" />
           </analyzer>
         </fieldType>
+        
+        <fieldType name="year" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+          <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+            <filter class="solr.PatternReplaceFilterFactory" pattern="^(\d+)?.*" replacement="$1"
+                replace="first"/>
+          </analyzer>
+        </fieldType>
 
         <fieldType name="lowercaseUntokenized" class="solr.TextField" sortMissingLast="true"
             omitNorms="true">
@@ -516,35 +525,42 @@
         <field name="mods.copyrightDate_s" type="string" indexed="true" stored="true" 
             multiValued="true"/>
         <copyField source="mods.copyrightDate" dest="mods.copyrightDate_s" />
+        <copyField source="mods.copyrightDate" dest="mods.copyrightDate_year" />
         
         <!-- single-valued -->
         <field name="mods.dateCreated" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateCreated_s" type="string" indexed="true" stored="true" 
             multiValued="false"/>
         <copyField source="mods.dateCreated" dest="mods.dateCreated_s" />
+        <copyField source="mods.dateCreated" dest="mods.dateCreated_year" />
         
         <field name="mods.dateValid" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateValid_s" type="string" indexed="true" stored="true" multiValued="false"/>
         <copyField source="mods.dateValid" dest="mods.dateValid_s" />
+        <copyField source="mods.dateValid" dest="mods.dateValid_year" />
         
         <field name="mods.dateIssued" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateIssued_s" type="string" indexed="true" stored="true" multiValued="false"/>
         <copyField source="mods.dateIssued" dest="mods.dateIssued_s" />
+        <copyField source="mods.dateIssued" dest="mods.dateIssued_year" />
         
         <field name="mods.dateSubmitted" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateSubmitted_s" type="string" indexed="true" stored="true" 
             multiValued="false"/>
         <copyField source="mods.dateSubmitted" dest="mods.dateSubmitted_s" />
+        <copyField source="mods.dateSubmitted" dest="mods.dateSubmitted_year" />
         
         <field name="mods.dateCaptured" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateCaptured_s" type="string" indexed="true" stored="true" 
             multiValued="false"/>
         <copyField source="mods.dateCaptured" dest="mods.dateCaptured_s" />
+        <copyField source="mods.dateCaptured" dest="mods.dateCaptured_year" />        
         
         <field name="mods.dateAvailable" type="text" indexed="true" stored="false" multiValued="false"/>
         <field name="mods.dateAvailable_s" type="string" indexed="true" stored="true" 
             multiValued="false"/>
         <copyField source="mods.dateAvailable" dest="mods.dateAvailable_s" />
+        <copyField source="mods.dateAvailable" dest="mods.dateAvailable_year" />
         
         <!-- end date fields -->
         
@@ -613,6 +629,7 @@
      Longer patterns will be matched first.  if equal size patterns
      both match, the first appearing in the schema will be used.  -->
 
+        <dynamicField name="*_year" type="year" indexed="true" stored="false" multivalued="true"/>
         <dynamicField name="*_date" type="date" indexed="true" stored="true" multiValued="true"/>
         <dynamicField name="*_s" type="string" indexed="true" stored="true" multiValued="true"/>
 
