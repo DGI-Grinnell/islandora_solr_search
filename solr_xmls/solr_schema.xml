@@ -258,6 +258,16 @@
                 replace="first"/>
           </analyzer>
         </fieldType>
+        
+        <fieldType name="coverage" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+          <analyzer>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <filter class="solr.TrimFilterFactory"/>
+            <!-- Replace yyyy-mm-dd or yyyy-mm dates with yyyy -->
+            <filter class="solr.PatternReplaceFilterFactory" pattern="^(\d{4})(-\d{2})?(-\d{2})?.*" replacement="$1"
+                replace="first"/>
+          </analyzer>
+        </fieldType>
 
         <fieldType name="lowercaseUntokenized" class="solr.TextField" sortMissingLast="true"
             omitNorms="true">
@@ -412,8 +422,10 @@
         <copyField source="dc.subject.chronological" dest="dc.subject_chronological_s"></copyField>
         
         <!-- merged 'Coverage' field for place, chronological -->
+        <!--
         <copyField source="dc.subject.place" dest="dc.coverage_s"></copyField>
         <copyField source="dc.subject.chronological" dest="dc.coverage_s"></copyField>
+        -->
         
         <copyField source="dc.subject.lcc" dest="dc.subject_lcc_s"></copyField>
         <copyField source="dc.subject.ddc" dest="dc.subject_ddc_i"></copyField>
@@ -563,6 +575,13 @@
         <copyField source="mods.dateAvailable" dest="mods.dateAvailable_year" />
         
         <!-- end date fields -->
+        
+        <!-- coverage -->
+        <field name="dc.coverage" type="coverage" indexed="true" stored="false" multiValued="true" />
+        <copyField source="mods.subject.chronological" dest="dc.coverage" />
+        <copyField source="mods.subject.geographic" dest="dc.coverage" />
+        <copyField source="mods.subject.temporal.start" dest="dc.coverage" />
+        <copyField source="mods.subject.temporal.end" dest="dc.coverage" />
         
         <copyField source="mods.physicalLocation" dest="mods.physicalLocation_s" />
         <field name="mods.physicalLocation" type="text" indexed="true" stored="false"
