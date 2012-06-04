@@ -593,6 +593,9 @@
         <field name="mods.identifier_s" type="string" indexed="true" stored="true" 
             multiValued="true"/>
         
+        <field name="rels.isViewableByRole" type="string" indexed="true" stored="false" multiValued="true" default="all" />
+        <field name="rels.isViewableByUser" type="string" indexed="true" stored="false" multiValued="true" default="all" />
+        
         <copyField source="rels.isMemberOf" dest="collection" />
         <field name="rels.isMemberOf" type="text" indexed="true" stored="false" multiValued="true"/>
         <copyField source="rels.isMemberOfCollection" dest="collection" />
