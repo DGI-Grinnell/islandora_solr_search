@@ -139,7 +139,14 @@
                 <xsl:attribute name="name">
                     <xsl:value-of select="concat('rels.', substring-after(name(),':'))"/>
                 </xsl:attribute>
-                <xsl:value-of select="@rdf:resource"/>
+                <xsl:choose>
+                  <xsl:when test="@rdf:resource">
+                    <xsl:value-of select="@rdf:resource"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="normalize-space()"/>
+                  </xsl:otherwise>
+                </xsl:choose>
             </field>
         </xsl:for-each>
 
