@@ -134,7 +134,7 @@
         </xsl:for-each>
 
         <xsl:for-each
-            select="foxml:datastream[@ID='RELS-EXT']/foxml:datastreamVersion[last()]/foxml:xmlContent//rdf:description/*">
+            select="foxml:datastream[@ID='RELS-EXT']/foxml:datastreamVersion[last()]/foxml:xmlContent//rdf:Description/*">
             <field>
                 <xsl:attribute name="name">
                     <xsl:value-of select="concat('rels.', substring-after(name(),':'))"/>
