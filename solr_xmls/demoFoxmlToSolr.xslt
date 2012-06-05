@@ -137,7 +137,7 @@
             select="foxml:datastream[@ID='RELS-EXT']/foxml:datastreamVersion[last()]/foxml:xmlContent//rdf:Description/*">
             <field>
                 <xsl:attribute name="name">
-                    <xsl:value-of select="concat('rels.', substring-after(name(),':'))"/>
+                    <xsl:value-of select="concat('rels.', local-name())"/>
                 </xsl:attribute>
                 <xsl:choose>
                   <xsl:when test="@rdf:resource">
