@@ -134,12 +134,19 @@
         </xsl:for-each>
 
         <xsl:for-each
-            select="foxml:datastream[@ID='RELS-EXT']/foxml:datastreamVersion[last()]/foxml:xmlContent//rdf:description/*">
+            select="foxml:datastream[@ID='RELS-EXT']/foxml:datastreamVersion[last()]/foxml:xmlContent//rdf:Description/*">
             <field>
                 <xsl:attribute name="name">
-                    <xsl:value-of select="concat('rels.', substring-after(name(),':'))"/>
+                    <xsl:value-of select="concat('rels.', local-name())"/>
                 </xsl:attribute>
-                <xsl:value-of select="@rdf:resource"/>
+                <xsl:choose>
+                  <xsl:when test="@rdf:resource">
+                    <xsl:value-of select="@rdf:resource"/>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <xsl:value-of select="normalize-space()"/>
+                  </xsl:otherwise>
+                </xsl:choose>
             </field>
         </xsl:for-each>
 
