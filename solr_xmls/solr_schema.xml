@@ -379,7 +379,8 @@
         <!-- 5 coverage fields - up to 36 -->
         <copyField source="dc.coverage.*" dest="text"></copyField>
         <!-- 10 subject fields - up to 46 -->
-        <copyField source="dc.subject*" dest="text"></copyField>
+        <copyField source="dc.subject" dest="text"></copyField>
+        <copyField source="dc.subject.*" dest="text"></copyField>
         <!-- 13 identifier fields - up to 59 -->
         <copyField source="dc.identifier.*" dest="text"></copyField>
         <copyField source="dc.identifier.nih" dest="dc.identifier.grant"></copyField>
