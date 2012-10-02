@@ -137,9 +137,8 @@ EOT
         '#type' => 'select',
         '#default_value' => (isset($values['sort']) ? $values['sort'] : 'score'),
         '#options' => array( //XXX:  Need to make configurable...
-          'score' => t('Relevance'),
-          'mods_title_mlt' => t('Title'),
-          'mods_dateIssued_s' => t('Date Issued'),
+          'mods.indexTitle' => t('Title'),
+          'mods.dateCreated_s' => t('Date Created'),
         ),
       ),
       'order' => array(
@@ -169,6 +168,8 @@ function islandora_extended_search_form_submit(array $form, array &$form_state) 
   $_SESSION['islandora_extended_search']['values'] = $form_state['values'];
   //$_SESSION['islandora_extended_search']['sort'] = $form_state['values']['sort'];
   //$_SESSION['islandora_extended_search']['order'] = $form_state['values']['order'];
+  $_SESSION['scholar']['search']['sort'] = $form_state['values']['sort'];
+  $_SESSION['scholar']['search']['order'] = $form_state['values']['order'];
   $query = _islandora_extended_search_form_build_query($form_state);
   $form_state['redirect'] = 'islandora/solr/search/' . urlencode($query) . '/'; // Redirect to the search.
 }

@@ -182,6 +182,7 @@ class IslandoraSolrQueryProcessor {
       'hl' => isset($keys[0]) ? 'true' : NULL,
       'hl.fl' => isset($keys[0]) ? trim($keys[0]) : NULL,
       'hl.fragsize' => 150,
+      'q.op' => 'AND',
       'hl.simple.pre' => '<strong>',
       'hl.simple.post' => '</strong>',
     );
@@ -242,7 +243,7 @@ class IslandoraSolrQueryProcessor {
 
     // if no qf fields are specified in the requestHandler a default list is supplied here for dismax searches
     if (!variable_get('dismax_allowed', 0) && $this->internalSolrParams['type'] == "dismax") {
-      $this->solrParams['qf'] = 'dc.title^5 dc.subject^2 dc.description^2 dc.creator^2 dc.contributor^1 dc.type';
+      $this->solrParams['qf'] = 'dc.title^5 dc.subject^2 dc.description^2 dc.creator^2 dc.contributor^1 dc.type text';
     }
 
     // Invoke a hook for third-party modules to alter the parameters.
